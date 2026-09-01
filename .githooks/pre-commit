@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Refuse a commit that would publish a stale generated file, or let the
+# walkthrough's two surfaces drift apart.
+#
+# It detects staleness by RUNNING the generators, so a stale file is already
+# regenerated in your working tree by the time you read the message. It does not
+# stage or commit them for you — a hook that quietly adds files to a commit you
+# are in the middle of writing is a worse surprise than the one it prevents.
+#
+# Enabled by:  git config core.hooksPath .githooks
+set -u
+cd "$(git rev-parse --show-toplevel)"
+fail=0
+
+say() { printf '  %s\n' "$1"; }
+
+# 1 · references/ must match full-pack.txt
+before=$(find references -name '*.md' -exec shasum {} + | shasum)
+python3 scripts/split.py >/dev/null 2>&1
+after=$(find references -name '*.md' -exec shasum {} + | shasum)
+if [ "$before" != "$after" ]; then
+  say "references/ was stale — full-pack.txt changed without a re-split."
+  say "   already regenerated; stage it:  git add references/"
+  fail=1
+fi
+
+# 2 · docs/*.html must match docs/src/
+before=$(shasum docs/*.html | shasum)
+python3 scripts/build-docs.py >/dev/null 2>&1
+after=$(shasum docs/*.html | shasum)
+if [ "$before" != "$after" ]; then
+  say "docs/*.html was stale — a fragment changed without a rebuild."
+  say "   already regenerated; stage it:  git add docs/"
+  fail=1
+fi
+
+# 3 · the walkthrough's two surfaces must agree, or declare why they do not
+if ! out=$(python3 scripts/check-docs.py 2>&1); then
+  printf '%s\n' "$out" | sed 's/^/  /'
+  fail=1
+fi
+
+if [ "$fail" != "0" ]; then
+  echo
+  echo "  pre-commit refused. Fix the above, or --no-verify if you mean it."
+  exit 1
+fi
+exit 0

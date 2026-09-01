@@ -269,6 +269,17 @@ python3 scripts/check-docs.py   # fails if the walkthrough's two surfaces drift
 
 Editing a generated file directly loses your change on the next build.
 
+Enable the pre-commit hook once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It refuses a commit that would publish a stale generated file, or let the
+walkthrough's two surfaces drift. It regenerates to detect staleness, so a
+stale file is already fixed in your working tree by the time it tells you —
+but it will not stage it for you.
+
 `GETTING-STARTED.md` and `docs/src/index.html` tell the same story to different
 readers and neither can be generated from the other without degrading it, so
 they cannot share a source. `check-docs.py` compares their section headings and
