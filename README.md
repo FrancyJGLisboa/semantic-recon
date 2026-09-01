@@ -52,6 +52,10 @@ server, or a repository.
 Use it when the same system will be used repeatedly, by agents, and being
 silently wrong is expensive. Do not use it for a one-off query.
 
+**New here? [GETTING-STARTED.md](GETTING-STARTED.md)** walks the whole path —
+install, the prompt, what comes out, and how to use it — with real output from
+a real run.
+
 ## Install
 
 ```bash
