@@ -1,6 +1,6 @@
 # Independent Final Auditor
 
-<!-- Generated from references/full-pack.txt (pack v2.6) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 10. INDEPENDENT FINAL AUDITOR PROMPT

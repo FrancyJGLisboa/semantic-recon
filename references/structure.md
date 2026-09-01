@@ -1,6 +1,6 @@
 # Type-Specific Probes + Output Structure
 
-<!-- Generated from references/full-pack.txt (pack v2.6) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.2 TYPE-SPECIFIC MANDATORY PROBES
@@ -45,8 +45,31 @@ DATA_FILE
 - Identifier columns coerced by a spreadsheet somewhere upstream: leading zeros
   stripped from postal codes, FIPS, municipality codes. The join silently
   misses rather than failing.
-- ETag and Last-Modified. Without them, nobody can tell that today's file
-  differs from yesterday's, and a refresh cannot be scoped.
+- CAN A VERSION BE PINNED, AND HOW? Ask that, not "is there an ETag". The
+  answers form a ladder, and where the target sits changes what the contract
+  has to promise:
+
+    a URL naming an immutable version   reproducibility is free. Pin it and an
+      (a commit SHA, a dated release     old read can be repeated exactly, for
+       path, a content-addressed store)  ever. Record the pinned form as the
+                                         canonical way to cite this data.
+    ETag or Last-Modified only          a change can be DETECTED but an old
+                                        read cannot be reproduced. Different
+                                        promise, and a weaker one.
+    neither                             nothing in the response says the file
+                                        moved. Hash the body at fetch time and
+                                        store the digest with whatever you
+                                        derive from it.
+
+  A file in a version-controlled store looks exactly like a file on a portal
+  and is not: the same bytes arrive with a full history and an addressable
+  version. Probing only for an ETag would miss that, and the contract would
+  end up carrying a hash-it-yourself rule for a target that had already solved
+  the problem — a refusal that protects nothing and costs the caller work.
+
+  Also check how long "latest" is stale for. A cache-control max-age on the
+  mutable URL means the newest read is fuzzy for that window even when the
+  underlying store is exact.
 - Wide versus long, and whether the period is a column or a row.
 - Error behaviour on a bad path: loud, or 200 with a human page.
 - Row count against any documented total. Silent truncation at a server limit

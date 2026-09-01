@@ -1,5 +1,5 @@
 SEMANTIC RECONNAISSANCE PROMPT PACK
-Version: 2.6
+Version: 2.7
 Roles: eleven, one per phase, each with its own prompt below. They may be run
 by one agent sequentially or by several in parallel — the gates, not the agent
 count, are what make the result trustworthy.
@@ -27,6 +27,9 @@ Changes from v1.0:
 + CONTRACT_ID is DERIVED BY THE AGENT (section 0.1a + 1b), not supplied by the
   operator, using a cheap identity probe and deterministic normalization so the
   same system always yields the same slug.
++ The DATA_FILE versioning probe asks whether a version can be PINNED, rather
+  than whether an ETag exists — the earlier wording assumed absence and would
+  have missed a target that already solved reproducibility.
 + DATA_FILE, a fifth target type: one or more URLs serving a dataset directly.
   Its own vocabulary column and probe list, headed by "verify the content, not
   the Content-Type".
@@ -102,7 +105,7 @@ BUSINESS RULE  | source selection,       | constraints, triggers,      | idempot
                | suppression, vintages   | soft delete, tenancy        | rate limits, confirmation reqs  | permissions, guard clauses
 FORBIDDEN OP   | join that fans out,     | cross-db join, unbounded    | destructive tool without        | writing to the DB bypassing | comparing across a break flag; dropping flags; treating a marker as 0
                | mixed vintages          | scan, lock escalation       | confirmation, non-idempotent    | the service layer
-REVISION       | vintages, restatements  | updated_at, history tables  | protocol/tool version drift     | migrations, deprecated APIs | does the file change in place; is there an ETag or Last-Modified
+REVISION       | vintages, restatements  | updated_at, history tables  | protocol/tool version drift     | migrations, deprecated APIs | can a version be pinned? immutable URL, change-detection only, or neither
 DISCOVERY      | metadata / catalog      | information_schema,         | tools/list, resources/list,     | README, ADRs, tests, types, | code lists, data dictionary, the structural metadata beside the file
   SURFACE      | endpoints, OpenAPI      | pg_catalog, EXPLAIN         | prompts/list, server info       | schemas, CI config
 
@@ -312,8 +315,31 @@ DATA_FILE
 - Identifier columns coerced by a spreadsheet somewhere upstream: leading zeros
   stripped from postal codes, FIPS, municipality codes. The join silently
   misses rather than failing.
-- ETag and Last-Modified. Without them, nobody can tell that today's file
-  differs from yesterday's, and a refresh cannot be scoped.
+- CAN A VERSION BE PINNED, AND HOW? Ask that, not "is there an ETag". The
+  answers form a ladder, and where the target sits changes what the contract
+  has to promise:
+
+    a URL naming an immutable version   reproducibility is free. Pin it and an
+      (a commit SHA, a dated release     old read can be repeated exactly, for
+       path, a content-addressed store)  ever. Record the pinned form as the
+                                         canonical way to cite this data.
+    ETag or Last-Modified only          a change can be DETECTED but an old
+                                        read cannot be reproduced. Different
+                                        promise, and a weaker one.
+    neither                             nothing in the response says the file
+                                        moved. Hash the body at fetch time and
+                                        store the digest with whatever you
+                                        derive from it.
+
+  A file in a version-controlled store looks exactly like a file on a portal
+  and is not: the same bytes arrive with a full history and an addressable
+  version. Probing only for an ETag would miss that, and the contract would
+  end up carrying a hash-it-yourself rule for a target that had already solved
+  the problem — a refusal that protects nothing and costs the caller work.
+
+  Also check how long "latest" is stale for. A cache-control max-age on the
+  mutable URL means the newest read is fuzzy for that window even when the
+  underlying store is exact.
 - Wide versus long, and whether the period is a column or a row.
 - Error behaviour on a bad path: loud, or 200 with a human page.
 - Row count against any documented total. Silent truncation at a server limit
@@ -1789,5 +1815,5 @@ Final sanity check, to be answered honestly by the Orchestrator:
 
 
 ======================================================================
-END OF PROMPT PACK v2.6
+END OF PROMPT PACK v2.7
 ======================================================================

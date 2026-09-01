@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.7
+- The `DATA_FILE` versioning probe now asks **can a version be pinned, and
+  how**, instead of whether an ETag exists. The old wording was written against
+  a target that had no versioning at all, so it assumed absence.
+- The answers form a ladder — an immutable URL, change-detection only, or
+  neither — and where a target sits changes what the contract must promise.
+  A file in a version-controlled store looks exactly like a file on a portal
+  and is not: the same bytes come with a history and an addressable version.
+- Probing only for an ETag would have left a contract carrying a
+  hash-it-yourself rule for a target that had already solved reproducibility —
+  a refusal that protects nothing and costs the caller work.
+- Also probes how long "latest" stays stale: a cache-control max-age makes the
+  newest read fuzzy for that window even when the store underneath is exact.
+- Found by looking at a directory of CSVs on a git branch, without running a
+  full reconnaissance on it.
+
 ## 2.6
 - `DATA_FILE`, a fifth target type: one or more URLs serving a dataset
   directly. It had no vocabulary and no probes, and it is the most common thing

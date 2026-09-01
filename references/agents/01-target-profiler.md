@@ -1,6 +1,6 @@
 # Target Profiler (runs first)
 
-<!-- Generated from references/full-pack.txt (pack v2.6) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 1b. TARGET PROFILER PROMPT   (RUNS BEFORE EVERYTHING; BLOCKS THE RUN)

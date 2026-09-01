@@ -1,6 +1,6 @@
 # Target Profile + Vocabulary Mapping
 
-<!-- Generated from references/full-pack.txt (pack v2.6) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0. TARGET PROFILE  (FILL THIS BEFORE ANY AGENT RUNS)
@@ -58,7 +58,7 @@ BUSINESS RULE  | source selection,       | constraints, triggers,      | idempot
                | suppression, vintages   | soft delete, tenancy        | rate limits, confirmation reqs  | permissions, guard clauses
 FORBIDDEN OP   | join that fans out,     | cross-db join, unbounded    | destructive tool without        | writing to the DB bypassing | comparing across a break flag; dropping flags; treating a marker as 0
                | mixed vintages          | scan, lock escalation       | confirmation, non-idempotent    | the service layer
-REVISION       | vintages, restatements  | updated_at, history tables  | protocol/tool version drift     | migrations, deprecated APIs | does the file change in place; is there an ETag or Last-Modified
+REVISION       | vintages, restatements  | updated_at, history tables  | protocol/tool version drift     | migrations, deprecated APIs | can a version be pinned? immutable URL, change-detection only, or neither
 DISCOVERY      | metadata / catalog      | information_schema,         | tools/list, resources/list,     | README, ADRs, tests, types, | code lists, data dictionary, the structural metadata beside the file
   SURFACE      | endpoints, OpenAPI      | pg_catalog, EXPLAIN         | prompts/list, server info       | schemas, CI config
 

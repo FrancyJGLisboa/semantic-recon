@@ -3,7 +3,7 @@ name: semantic-recon
 description: Give AI agents better conditions to be built with expertise on a system: probe an API, MCP server, database, or codebase by running it, and compile what it actually does into a data_contract_<id>/ folder whose code refuses the operations that are silently wrong. Use when asked to map, learn, document, or build a contract for a system so other agents can use it correctly; when credentials for a system exist and its semantics must be discovered and verified; or on any invocation like /semantic-recon, "semantic orchestrator", "build a data contract", "make agents expert on this system", "refresh the contract". Eleven gated phases: holdout questions frozen before discovery, blast-radius triage, adversarial falsification, and a validate_query gate that refuses rather than describes.
 license: MIT
 metadata:
-  version: "2.6"
+  version: "2.7"
   pack: Semantic Reconnaissance Prompt Pack
 ---
 
