@@ -1,6 +1,6 @@
 # Reference Implementation Engineer
 
-<!-- Generated from references/full-pack.txt (pack v2.1) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.2) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 8. REFERENCE IMPLEMENTATION ENGINEER PROMPT
@@ -98,7 +98,70 @@ EXPIRED or DRIFT_DETECTED, the agent must surface that before answering, and
 must not present numbers as verified.
 
 ----------------------------------------------------------------------
-8.3 Primitives
+8.3 THE COMPLIANCE PASS RUNS TWICE
+----------------------------------------------------------------------
+
+An enforcement layer has two surfaces, and only one of them is the target
+system. The second is the code you just wrote. A run that attacks only the
+first will report ENFORCEMENT-G1 as passing while the gate is walkable, because
+every attempt it tried went through the front door.
+
+PASS 1 - AGAINST THE TARGET
+Malformed requests, forbidden combinations, boundaries, mixed sources, the
+traps the red team found. This is the obvious pass and it is not sufficient.
+
+PASS 2 - AGAINST YOUR OWN CODE
+Enumerate, in writing, every place where your own functions must take something
+on faith. Attack each one. The recurring classes:
+
+  a) CALLER-ASSERTED LABELS
+     Any argument that describes data the function cannot inspect is a claim,
+     not a fact: axis=, kind=, source=, level=, is_final=. A caller can assert
+     anything. aggregate(values, axis="time") summed two models the moment
+     somebody said the word "time".
+     Fix: take an object that carries its own identity, so there is nothing to
+     assert. Do not validate the label; remove the label.
+
+  b) OPT-IN VALIDATORS
+     A check the caller has to remember to call is not a gate, it is a
+     suggestion with a function signature. If validate_join() exists but two
+     results can be combined by list concatenation, the language is the bypass.
+     Fix: make the unchecked path impossible to express, not merely discouraged.
+
+  c) PROVENANCE-LOSING RETURNS
+     The moment a function hands back a bare scalar, list, or dict, every rule
+     that depends on identity becomes unenforceable downstream. Nothing can
+     check a float.
+     Fix: values leave the contract wrapped in something that knows its
+     product, source, version, unit, and grain. Provide a raw() escape hatch
+     and name it so it reads as one at the call site.
+
+  d) INJECTED ENVIRONMENT
+     Clocks, now/today, seeds, config, feature flags. A caller who supplies the
+     clock can walk past any freshness or recency check.
+     Fix: decide whether it is a test seam or a security boundary, and DECLARE
+     which in UNCERTAINTIES.md. A contract that protects against mistakes but
+     not against a determined caller is fine; a contract that is unclear about
+     which one it is, is not.
+
+  e) CONSTANTS MEASURED ONCE
+     Any threshold derived from a single observation - a lag, a limit, a
+     tolerance - is a guess wearing a number. Widen it for margin, trace it to
+     the observation in a comment, and file it as UNRESOLVED.
+
+Write pass 2's enumeration into the contract even where an item turned out to
+be safe. The list is the evidence that the pass happened; the absence of an
+item is indistinguishable from not having looked.
+
+REPORTING RULE
+Never state that no further bypass exists unless both passes ran and every
+class above was enumerated in writing. "I could not find another one" is a
+statement about your search, not about the code, and reporting it as the
+latter is the same failure mode this whole pack exists to prevent: a confident
+claim that fails silently.
+
+----------------------------------------------------------------------
+8.4 Primitives
 ----------------------------------------------------------------------
 
 Adapt names to your target. Typical surface:
@@ -133,7 +196,12 @@ ENFORCEMENT-G1 passes only if:
 - Values carrying a foreign contract_id are rejected, proven by a test.
 - Every UNRESOLVED item with a triggers_on entry is actually enforced.
 - Every override path requires an explicit named argument and logs its use.
-- A written attempt to reach a silently-wrong result through the public code
-  surface fails. Demonstrate this with at least three attempts in
-  tests/test_validators.py.
+- PASS 1 ran: at least three attempts to reach a silently-wrong result through
+  the target's surface, all refused, all in tests/test_validators.py.
+- PASS 2 ran: the five classes in section 8.3 enumerated in writing, each
+  attacked, every bypass either closed or DECLARED with its scope. An empty
+  enumeration fails this gate - it means the pass was skipped, not that the
+  code was clean.
+- No claim that "no further bypass exists" appears anywhere in the contract
+  unless both passes are documented.
 ```

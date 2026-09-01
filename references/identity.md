@@ -1,6 +1,6 @@
 # CONTRACT_ID Derivation + Identity Discipline
 
-<!-- Generated from references/full-pack.txt (pack v2.1) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.2) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.1a CONTRACT_ID DERIVATION  (owned by the Target Profiler, not the operator)
@@ -37,6 +37,11 @@ STEP 2 - NORMALIZE (deterministic; same input must always give same output)
   drop generic noise tokens anywhere in the name:
       api, service, svc, server, mcp, db, database, data, platform, system,
       the, official, public, rest, graphql, v1, v2, v3, prod, production
+  drop a trailing TLD when the name was taken from a domain or a page title:
+      com, io, org, net, dev, ai, app, co, cloud, xyz
+      (a system that names itself after its domain asserts the brand, not the
+       registrar; keeping the TLD forks the slug the moment another run reads
+       the brand from a different surface)
   drop version numbers and dates entirely
   if a vendor/org prefix is present and the product name alone is ambiguous,
       keep both:  usda_quickstats, not quickstats

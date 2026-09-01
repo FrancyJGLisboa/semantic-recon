@@ -1,6 +1,6 @@
 # Orchestrator
 
-<!-- Generated from references/full-pack.txt (pack v2.1) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.2) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 1. ORCHESTRATOR PROMPT

@@ -3,7 +3,7 @@ name: semantic-recon
 description: Run a multi-agent reconnaissance of a target system and compile a slug-scoped data_contract_<id>/ folder that makes future AI agents behave like an SME on it. Use when asked to map, learn, document, or build a contract for an API, MCP server, database, or codebase so other agents can use it correctly; when credentials for a system exist and its semantics must be discovered and verified; or on any invocation like /semantic-recon, "semantic orchestrator", "build a data contract", "make agents SME on this system", "refresh the contract". Enforces frozen holdout questions, blast-radius triage, adversarial falsification, and a validate_query gate that refuses rather than describes.
 license: MIT
 metadata:
-  version: "2.1"
+  version: "2.2"
   pack: Semantic Reconnaissance Multi-Agent Prompt Pack
 ---
 
@@ -37,7 +37,10 @@ system will be used repeatedly, by agents, and being silently wrong is expensive
    `LOUD_FAIL` claim already protects itself.
 4. **Code that refuses beats prose that explains.** If a downstream agent can
    produce a silently wrong result without any exception firing, that is a
-   defect in the code layer, not a documentation gap.
+   defect in the code layer, not a documentation gap. Attack the target AND
+   your own code — a caller-asserted label, an opt-in validator, or a bare
+   float handed back are all bypasses, and only the second pass finds them
+   (section 8.3).
 5. **Never persist, print, or document a credential.** Env injection only.
    Record the variable name in TARGET.md, never the value.
 6. **Every artifact is stamped with CONTRACT_ID.** Agents quote content, not
