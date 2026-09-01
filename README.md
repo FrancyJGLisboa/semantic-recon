@@ -43,6 +43,35 @@ written into it** was stopped five times by the tool's output, and reached
 correct code in two rounds of following the error messages — including for a
 reason its author never knew.
 
+## What changes
+
+Same question, same code, same API. The difference is whether a contract exists.
+
+**Without**
+```
+>>> forecast(52.52, 13.41)
+2026-09-01: 22.2 °C
+```
+Which of five models answered? Unknown. Which grid cell — you asked for one and
+got another a kilometre away? Unknown. Comparable to the figure you stored
+yesterday? No way to tell. **Nothing is wrong on the screen.**
+
+**With**
+```
+>>> forecast(52.52, 13.41)
+REFUSED: a forecast request with no explicit model
+INSTEAD: pass models='icon_seamless' …
+
+2026-09-01: 22.2 °C
+— forecast · icon_seamless · grid 52.5200,13.4200 (38 m) · tz Europe/Berlin
+```
+Stopped before the ambiguous call, told exactly how to fix it, and the answer
+names what produced it. **You did not have to know any of that.**
+
+That is the whole trade. You spend an hour once. After that, correctness on this
+system stops depending on whether the next person happens to know the five
+things that matter.
+
 ## What this rests on
 
 The pack has been run end to end twice, against two public weather APIs.
@@ -138,33 +167,45 @@ Symlinking keeps the clone as the single source of truth — pull, and all three
 CLIs see the change with no reinstall. `--copy` installs copies instead;
 `--uninstall` removes them.
 
-## Use
+## Three ways to use what came out
 
+Ranked by how little you have to do.
+
+**1 · Paste the bootstrap into any agent** — *no code.*
+Ten lines from `references/downstream.md`. The agent reads the routing table,
+calls the contract's functions instead of the API, and reports refusals instead
+of guessing. Works in any assistant that can read a folder.
+
+**2 · Import the code into what you are building** — *one import.*
+The refusals stop being advice and become structural: they fire whether or not
+anyone read the documentation.
+
+```python
+from data_contract_open_meteo.code import client, series
+
+res = client.query({"product": "forecast", "latitude": 52.52, "longitude": 13.41,
+                    "daily": "temperature_2m_max", "timezone": "UTC",
+                    "models": "icon_seamless", "forecast_days": 3})
+print(series.format_with_provenance(res[0]["daily"]["temperature_2m_max"]))
 ```
-/semantic-recon
-```
 
-or describe the task in words: *"build a data contract for this MCP server"*,
-*"make agents SME on this database"*.
+Leave out `models` and it refuses, naming the 1.7 °C spread between models and
+the exact call that fixes it.
 
-Two fields are always yours to supply, because they are decisions rather than
-discoveries:
+**3 · Point another agent at the folder and let it build** — *the leverage.*
+This is where it compounds. Build five things on one contract and all five
+inherit the same traps, without any of their authors learning them.
 
-| Field | Why you |
-|---|---|
-| `BLAST_RADIUS_OF_MISUSE` | Only you know what breaks in your business if an agent gets this system wrong |
-| `OUT_OF_SCOPE` | Only you know where this run should stop |
+> **The third way, measured.** We wrote a weather skill with **zero refusal
+> logic of its own** — no checks, no validation, nothing about models or
+> timezones. Its contract stopped it five times. Two rounds of following the
+> messages and it was correct, including for a reason its author never knew:
+> two models resolve to different grid cells.
 
-Everything else the skill determines, **including the contract's name.** The
-Target Profiler derives a slug from what the system calls itself, using
-deterministic normalization: the same asserted name always yields the same
-result. Two runs can still read that name from different surfaces, so a
-collision check against the registry catches the rest.
+Anything a person will read goes through `format_with_provenance()`. It is the
+only formatter a contract ships, and it cannot omit the source.
 
-Phase 1 costs at most three operations and returns the proposed slug with its
-derivation. Confirm there before spending a call budget.
-
-## What you get
+## What lands on disk
 
 ```
 ~/contracts/
