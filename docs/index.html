@@ -101,6 +101,29 @@ td.wide:first-child{white-space:normal;width:auto}
   font-family:var(--display);font-weight:500;font-size:1.16rem;line-height:1.38;
   letter-spacing:-.014em;max-width:34ch}
 
+
+/* ---------- plain-language opening ---------- */
+.why{padding:clamp(2rem,5vw,3.4rem) 0 clamp(2.4rem,6vw,4rem)}
+.why p{font-size:1.06rem;max-width:60ch}
+.why .big{font-family:var(--display);font-weight:600;font-size:clamp(1.35rem,3.2vw,1.9rem);
+  letter-spacing:-.022em;line-height:1.22;max-width:22ch;margin:0 0 1.6rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:3px;margin:2rem 0 .9rem;overflow:hidden}
+@media (max-width:560px){.split{grid-template-columns:1fr}}
+.split div{background:var(--surface);padding:1.5rem 1.4rem 1.3rem;text-align:center}
+.split .n{font-family:var(--display);font-weight:700;font-size:clamp(2rem,6vw,2.9rem);
+  letter-spacing:-.03em;line-height:1;color:var(--accent);display:block}
+.split .l{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);display:block;margin-top:.75rem}
+.askedonce{font-family:var(--mono);font-size:.74rem;letter-spacing:.05em;color:var(--muted);
+  text-align:center;margin:0 0 .3rem}
+.twist{font-size:.98rem;color:var(--muted);max-width:58ch;margin-top:.2rem}
+.twist b{color:var(--ink);font-weight:500}
+.sooner{margin:2.2rem 0 0;padding:1.2rem 1.35rem;background:var(--sunk);border-radius:3px;
+  font-size:1rem;line-height:1.55;max-width:62ch}
+.sooner b{font-family:var(--display);font-weight:600}
+.scroll{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin-top:2.6rem;display:block}
 footer{padding:3rem 0 5rem;border-top:1px solid var(--rule);color:var(--faint);font-size:.9rem}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
@@ -127,6 +150,33 @@ footer{padding:3rem 0 5rem;border-top:1px solid var(--rule);color:var(--faint);f
   <h1>Your first<br>contract</h1>
   <p class="lede">Better conditions for building AI agents with expertise on a system. Install to working code, with output from a real run against a public API you can reproduce yourself.</p>
 </header>
+
+<section class="why">
+  <p class="big">AI assistants can use real systems now. The risk is not that they crash.</p>
+  <p>It is that they hand you a number that is wrong and looks completely fine. Here is a real one, from a public weather service anyone can call.</p>
+
+  <p class="askedonce">“How much rain fell in Tokyo yesterday?”</p>
+  <div class="split">
+    <div><span class="n">4.1 mm</span><span class="l">one setting</span></div>
+    <div><span class="n">1.2 mm</span><span class="l">another setting</span></div>
+  </div>
+  <p class="twist">Same question, same day, same service. No error either way — both come back looking like <em>the</em> answer. And the setting is one most people never touch.</p>
+  <p class="twist"><b>Now the part that makes it dangerous.</b> If you check whether that setting matters by looking at temperature instead of rain, temperature comes back <em>identical</em> both ways. So you conclude the setting is cosmetic — and from that moment you are confidently wrong about rain.</p>
+  <p>Nobody hid this. It is the kind of thing that is obvious to whoever built the service and invisible to everyone else. Every real system has a handful of them.</p>
+
+  <div class="sooner">
+    <b>It is the difference between a new hire and a senior colleague.</b>
+    The senior does not know more facts. They know where the landmines are, and they stop you before you step on one. This tool writes that down — and makes it stop you by itself.
+  </div>
+
+  <p style="margin-top:2rem">So: it sends an AI to poke at a system for an hour. Try things, break things, write down what surprised it, with the actual numbers. Then it turns every surprise into a tripwire in code. After that, any AI working with that system hits the tripwire instead of the wrong answer — <strong>without having read anything.</strong></p>
+
+  <p>We tested that the obvious way. We built a small weather app with <strong>zero safety checks written into it</strong>. The tool's output stopped it five times. Two rounds of following the error messages and it was correct — including for a reason its author never knew.</p>
+
+  <p class="twist">That is what has been tried so far: two public weather services, one small app. The rest of this page is how you do it yourself.</p>
+
+  <span class="scroll">↓ install · prompt · what comes out · using it</span>
+</section>
 
 <section class="step">
   <div class="stepnum"><b>01</b><h2>Install</h2></div>

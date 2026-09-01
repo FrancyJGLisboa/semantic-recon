@@ -10,6 +10,38 @@ yourself.
 
 ---
 
+## In plain language
+
+AI assistants can use real systems now — a database, an internal API, a weather
+service. The risk is not that they crash. It is that they hand you a number
+that is wrong and looks completely fine.
+
+A real example. Ask a public weather service how much rain fell in Tokyo
+yesterday. The answer is **4.1 mm** or **1.2 mm** depending on one setting most
+people never touch. No error either way; both look like *the* answer. And if you
+check whether that setting matters by looking at temperature instead of rain,
+temperature comes back **identical** both ways — so you conclude it is
+cosmetic, and from then on you are confidently wrong about rain.
+
+Nobody hid that. It is the kind of thing that is obvious to whoever built the
+service and invisible to everyone else. Every real system has a handful.
+
+This tool sends an AI to poke at a system for an hour — try things, break
+things, write down what surprised it, with the actual numbers — and turns every
+surprise into a tripwire in code. After that, any AI working with that system
+hits the tripwire instead of the wrong answer, **without having read anything.**
+
+It is the difference between a new hire and a senior colleague. The senior does
+not know more facts; they know where the landmines are and stop you before you
+step on one.
+
+We tested it the obvious way: a small weather app with **zero safety checks
+written into it** was stopped five times by the tool's output, and reached
+correct code in two rounds of following the error messages — including for a
+reason its author never knew.
+
+---
+
 ## 1 · Install
 
 ```bash
