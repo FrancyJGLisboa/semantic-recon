@@ -1,6 +1,6 @@
 # The Registry Layer (multiple contracts)
 
-<!-- Generated from references/full-pack.txt (pack v2.5) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.6) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 12b. THE REGISTRY LAYER  (only once you hold more than one contract)

@@ -1,6 +1,6 @@
 # CONTRACT_ID Derivation + Identity Discipline
 
-<!-- Generated from references/full-pack.txt (pack v2.5) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.6) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.1a CONTRACT_ID DERIVATION  (owned by the Target Profiler, not the operator)
@@ -25,6 +25,12 @@ Take the first name that the target itself asserts. Precedence, highest first:
                name in the server command  ->  the binary name
   CODEBASE     the repo name  ->  package.json / pyproject / go.mod module name
                ->  the directory name
+  DATA_FILE    the dataset identifier in the URL path  ->  a title in the
+               structural metadata beside the file  ->  vendor + dataset code
+               NOTE: rank a Content-Disposition filename LAST, or not at all.
+               It frequently encodes the REQUEST rather than the dataset - a
+               filtered download names itself "..._filtered", so two requests
+               for one dataset would fork the slug.
 
 Prefer what the SYSTEM calls itself over what the operator calls it. The
 system's own name is stable across runs and across operators; a nickname is not.

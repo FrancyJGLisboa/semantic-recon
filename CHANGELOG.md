@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.6
+- `DATA_FILE`, a fifth target type: one or more URLs serving a dataset
+  directly. It had no vocabulary and no probes, and it is the most common thing
+  someone points an agent at.
+- Its probe list is headed by the failure mode that matters most for it: verify
+  the CONTENT, not the Content-Type. A portal answering 200 with a login page
+  while claiming text/csv yields one garbage row, which reads as "not much
+  data" rather than "not authenticated".
+- 0.1a gains a `DATA_FILE` precedence row that ranks Content-Disposition last,
+  because a filename like "..._filtered.tsv" describes the request rather than
+  the dataset and would fork the slug.
+- Both corrections came from running it, not from reasoning about it.
+
 ## 2.5
 - Section 12b.2: the registry's other job is proving that NO contract can answer
   a question, with reasons — something no single contract can do, because a

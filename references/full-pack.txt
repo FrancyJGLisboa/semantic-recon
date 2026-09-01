@@ -1,5 +1,5 @@
 SEMANTIC RECONNAISSANCE PROMPT PACK
-Version: 2.5
+Version: 2.6
 Roles: eleven, one per phase, each with its own prompt below. They may be run
 by one agent sequentially or by several in parallel — the gates, not the agent
 count, are what make the result trustworthy.
@@ -27,6 +27,9 @@ Changes from v1.0:
 + CONTRACT_ID is DERIVED BY THE AGENT (section 0.1a + 1b), not supplied by the
   operator, using a cheap identity probe and deterministic normalization so the
   same system always yields the same slug.
++ DATA_FILE, a fifth target type: one or more URLs serving a dataset directly.
+  Its own vocabulary column and probe list, headed by "verify the content, not
+  the Content-Type".
 + Section 12b.2: proving that NOTHING can answer is the registry's other job,
   and it needs `subject` required on every question. Two contracts in one
   domain do not test a registry.
@@ -59,6 +62,7 @@ CONTRACT_DIR:           data_contract_<CONTRACT_ID>
                         to this. Never use a bare "data_contract/".
 TARGET_NAME:            human-readable name
 TARGET_TYPE:            one of DATA_API | DATABASE | MCP_SERVER | CODEBASE
+                        | DATA_FILE  (one or more URLs serving a dataset directly)
 TARGET_LOCATION:        base URL, DSN, server command, repo path
 CREDENTIALS_AVAILABLE:  yes/no + how they are injected (never the values)
 WRITE_ACCESS:           read-only | read-write | unknown
@@ -80,26 +84,26 @@ Every agent prompt below uses abstract terms. Bind them using this table
 according to TARGET_TYPE. Where an example in this pack is domain-flavored,
 substitute the equivalent from your target's column.
 
-CONCEPT        | DATA_API                | DATABASE                    | MCP_SERVER                      | CODEBASE
+CONCEPT        | DATA_API                | DATABASE                    | MCP_SERVER                      | CODEBASE                     | DATA_FILE
 ---------------+-------------------------+-----------------------------+---------------------------------+------------------------------
-ACCESS         | auth scheme, base URL,  | DSN, driver, roles, grants, | transport, handshake, protocol  | build, install, entrypoints,
+ACCESS         | auth scheme, base URL,  | DSN, driver, roles, grants, | transport, handshake, protocol  | build, install, entrypoints, | URL, content-type vs actual content, redirects, whether an error is loud
                | endpoints               | schemas, search_path        | version, capability negotiation | env config, run modes
-ENTITY         | resource / dataset      | table / view / mat. view    | tool / resource / prompt        | module / service / domain object
-FIELD          | response field, param   | column                      | input+output schema property    | struct field, function param
-MEASURE        | metric / measure        | aggregate over a column     | what the tool RETURNS and means | computed value, emitted metric
-GRAIN          | one record = what?      | primary key grain           | one call = what unit of work?   | one invocation = what effect?
-RELATIONSHIP   | join key, expansion     | FK, junction table          | tool chaining / composition     | call graph, import graph, DI
-CARDINALITY    | 1:1 / 1:N / N:M         | FK cardinality, fan-out     | N calls needed per outcome      | fan-out of a call
-TEMPORAL       | observation vs          | valid_time vs transaction   | statefulness, session scope,    | migrations, API versioning,
+ENTITY         | resource / dataset      | table / view / mat. view    | tool / resource / prompt        | module / service / domain object | the dataset the file holds
+FIELD          | response field, param   | column                      | input+output schema property    | struct field, function param | a column - but the header may be compound, padded, or not on row 1
+MEASURE        | metric / measure        | aggregate over a column     | what the tool RETURNS and means | computed value, emitted metric | a cell, which may carry a flag glued to the number
+GRAIN          | one record = what?      | primary key grain           | one call = what unit of work?   | one invocation = what effect? | what one row is; often a compound key packed into one column
+RELATIONSHIP   | join key, expansion     | FK, junction table          | tool chaining / composition     | call graph, import graph, DI | joins to code lists that live in another file entirely
+CARDINALITY    | 1:1 / 1:N / N:M         | FK cardinality, fan-out     | N calls needed per outcome      | fan-out of a call | rows x period columns; wide vs long changes what a row means
+TEMPORAL       | observation vs          | valid_time vs transaction   | statefulness, session scope,    | migrations, API versioning, | period as columns or as a row; breaks in series
                | publication vs revision | time, as_of, soft deletes   | cache TTL, idempotency window   | eventual consistency
-AUTHORITY      | source precedence       | source of truth vs replica  | which server owns which fact    | which module owns which write
+AUTHORITY      | source precedence       | source of truth vs replica  | which server owns which fact    | which module owns which write | which URL governs when a 'latest' and a dated one both exist
                |                         | vs materialized view        | when servers overlap            | path
-BUSINESS RULE  | source selection,       | constraints, triggers,      | idempotency, side effects,      | invariants, feature flags,
+BUSINESS RULE  | source selection,       | constraints, triggers,      | idempotency, side effects,      | invariants, feature flags, | flag semantics, missing markers, rounding, what may be compared
                | suppression, vintages   | soft delete, tenancy        | rate limits, confirmation reqs  | permissions, guard clauses
-FORBIDDEN OP   | join that fans out,     | cross-db join, unbounded    | destructive tool without        | writing to the DB bypassing
+FORBIDDEN OP   | join that fans out,     | cross-db join, unbounded    | destructive tool without        | writing to the DB bypassing | comparing across a break flag; dropping flags; treating a marker as 0
                | mixed vintages          | scan, lock escalation       | confirmation, non-idempotent    | the service layer
-REVISION       | vintages, restatements  | updated_at, history tables  | protocol/tool version drift     | migrations, deprecated APIs
-DISCOVERY      | metadata / catalog      | information_schema,         | tools/list, resources/list,     | README, ADRs, tests, types,
+REVISION       | vintages, restatements  | updated_at, history tables  | protocol/tool version drift     | migrations, deprecated APIs | does the file change in place; is there an ETag or Last-Modified
+DISCOVERY      | metadata / catalog      | information_schema,         | tools/list, resources/list,     | README, ADRs, tests, types, | code lists, data dictionary, the structural metadata beside the file
   SURFACE      | endpoints, OpenAPI      | pg_catalog, EXPLAIN         | prompts/list, server info       | schemas, CI config
 
 ----------------------------------------------------------------------
@@ -125,6 +129,12 @@ Take the first name that the target itself asserts. Precedence, highest first:
                name in the server command  ->  the binary name
   CODEBASE     the repo name  ->  package.json / pyproject / go.mod module name
                ->  the directory name
+  DATA_FILE    the dataset identifier in the URL path  ->  a title in the
+               structural metadata beside the file  ->  vendor + dataset code
+               NOTE: rank a Content-Disposition filename LAST, or not at all.
+               It frequently encodes the REQUEST rather than the dataset - a
+               filtered download names itself "..._filtered", so two requests
+               for one dataset would fork the slug.
 
 Prefer what the SYSTEM calls itself over what the operator calls it. The
 system's own name is stable across runs and across operators; a nickname is not.
@@ -280,6 +290,34 @@ MCP_SERVER
 - argument coercion behavior: what does it do with a wrong type or extra field
 - whether tool results are truncated, and at what size
 - ordering/statefulness: does tool B require tool A to have run first
+
+DATA_FILE
+- Fetch it and check the CONTENT, not the Content-Type. A portal that redirects
+  to a login, an error page or a cookie wall commonly answers 200 with HTML
+  while still claiming text/csv. Parsing that yields one garbage row and reads
+  as "not much data" rather than "not authenticated". This is the single most
+  common way an agent pointed at a data URL goes wrong.
+- Line endings, byte-order mark, encoding. A CRLF file split on \n leaves \r
+  glued to the last value of every row.
+- Where the header actually starts. Title rows above it, two-row headers,
+  padded cells ('2020 ' with a trailing space), duplicate column names.
+- The delimiter, AND whether it collides with the locale's decimal separator.
+  A semicolon file with comma decimals read as CSV splits every number in two.
+- The COMPLETE set of non-numeric cell contents, counted. Distinguish two
+  different things that look alike: missing markers (':', '', '-', 'N/A', '..')
+  and quality flags. Flags may be glued to the value with a separator, so a
+  cell can be a number AND a flag, or a marker AND a flag.
+- What each flag MEANS, and which ones invalidate a comparison rather than
+  merely annotating it. A break-in-series flag is not decoration.
+- Identifier columns coerced by a spreadsheet somewhere upstream: leading zeros
+  stripped from postal codes, FIPS, municipality codes. The join silently
+  misses rather than failing.
+- ETag and Last-Modified. Without them, nobody can tell that today's file
+  differs from yesterday's, and a refresh cannot be scoped.
+- Wide versus long, and whether the period is a column or a row.
+- Error behaviour on a bad path: loud, or 200 with a human page.
+- Row count against any documented total. Silent truncation at a server limit
+  looks exactly like a small dataset.
 
 CODEBASE
 - entrypoints, build, test, and run commands, each actually executed once
@@ -1751,5 +1789,5 @@ Final sanity check, to be answered honestly by the Orchestrator:
 
 
 ======================================================================
-END OF PROMPT PACK v2.5
+END OF PROMPT PACK v2.6
 ======================================================================
