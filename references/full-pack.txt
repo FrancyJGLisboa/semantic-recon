@@ -1,5 +1,8 @@
-SEMANTIC RECONNAISSANCE MULTI-AGENT PROMPT PACK
+SEMANTIC RECONNAISSANCE PROMPT PACK
 Version: 2.4
+Roles: eleven, one per phase, each with its own prompt below. They may be run
+by one agent sequentially or by several in parallel — the gates, not the agent
+count, are what make the result trustworthy.
 Purpose: Discover, learn, falsify, and compile the access mechanics, structure,
 semantics, ontology, business contracts, traps, playbooks, and deterministic code
 needed for a future AI agent to operate a target system correctly WITHOUT

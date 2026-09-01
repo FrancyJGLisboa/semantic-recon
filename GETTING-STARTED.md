@@ -1,8 +1,12 @@
 # Getting started
 
-End to end, with real output from a real run. The worked example is Open-Meteo,
+Better conditions for building AI agents with expertise on a system: probe the
+target by running it, compile what it does into refusals code enforces, and let
+whatever you build on top inherit those limits without learning them.
+
+End to end below, with output from a real run. The worked example is Open-Meteo,
 a public weather API that needs no credentials, so you can reproduce every step
-below yourself.
+yourself.
 
 ---
 
@@ -25,8 +29,10 @@ The installer detects which agent CLIs are present and skips the rest. It
 symlinks, so `git pull` updates all of them at once. Use `--copy` if you would
 rather have independent copies, `--uninstall` to remove.
 
-**Verify it loaded.** In Claude Code, type `/` and look for `semantic-recon` in
-the list. It appears without restarting.
+**Verify it loaded.** In Claude Code, type `/` and look for `semantic-recon`.
+It appears without restarting. All three CLIs read the same skill layout, but
+loading has only been confirmed in Claude Code — check yours before relying
+on it.
 
 ---
 
@@ -82,10 +88,12 @@ contract_id_derivation:
   escalated_to_human:  no
 ```
 
-The slug is derived deterministically from what the system calls itself, so two
-runs on one system never fork into two contracts. If you disagree with it, say
-so now — after this point the name is frozen and appears in the folder name,
-the Python package, and every file header.
+The slug is derived deterministically: the same asserted name always normalizes
+to the same result. Two runs can still read the name from different surfaces —
+a page title one time, an OpenAPI `info.title` the next — so the collision check
+against `INDEX.md` is what catches the rest. If you disagree with the name, say
+so now. After this point it is frozen, and it appears in the folder name, the
+Python package, and every file header.
 
 Say `continue` and the remaining phases run: freeze the exam, explore access,
 profile structure, map semantics, find the business rules, try to break every
@@ -116,9 +124,13 @@ claim, compile the code, compile the contract, and audit it clean-room.
 a competent agent could rebuild most of it from the vendor's docs.
 
 **The half that is the point** — `TRAPS`, `UNCERTAINTIES`, `AUTHORITY_POLICY`,
-`counterexamples.yaml`, `validators.py`. None of it exists without having
-probed the system. From the real Open-Meteo run, none of these five appear
-anywhere in Open-Meteo's own documentation:
+`counterexamples.yaml`, `validators.py`. None of it exists without having probed
+the system, and each item carries the measurement that established it.
+
+Open-Meteo does document some of this in prose. That is not the same as an agent
+loading it at the moment it builds a request, which is the entire point: the
+contract turns each one into a refusal that fires whether or not anybody read
+anything. Five, from the real run:
 
 - the two products return different values for the same past date, from
   different grid cells
@@ -193,8 +205,10 @@ INSTEAD: pass models='icon_seamless' (or ecmwf_ifs025 / gfs_seamless), or pass
 
 Every refusal carries three things: what was refused, why in one sentence, and
 the correct call ready to copy. Following the messages is how you converge on
-correct usage — an agent with no knowledge of the API reached working code in
-two rounds of doing exactly that.
+correct usage. In the one test of this so far, a weather skill written with
+**zero refusal logic of its own** was stopped five times, reached working code
+in two rounds of following the messages, and inherited a fact its author never
+knew — that two models resolve to different grid cells.
 
 **Anything a person will read** goes through `format_with_provenance()`. It is
 the only formatter the contract ships, and it cannot omit the source.
@@ -257,6 +271,16 @@ anything is overwritten.
 ## When not to use this
 
 Not for a one-off query. The cost is paid once and the protection is
-distributed forever, so the return comes from repetition: build five things on
-one contract and all five inherit the same traps and refusals without anyone
+distributed, so the return comes from repetition: build five things on one
+contract and all five inherit the same traps and refusals without anyone
 rediscovering them. For a single question, just call the API.
+
+## What has and has not been shown
+
+Run end to end twice, against two public weather APIs. Two contracts audited
+clean-room against questions frozen before discovery: 20/22 and 17/17 correct,
+zero wrong. 64 tests. Loading confirmed in Claude Code.
+
+Not shown: loading in Codex or Copilot CLI, any target that is not a
+`DATA_API`, or anything general about agent behaviour. What was measured is one
+skill inheriting refusals it did not write.
