@@ -371,8 +371,12 @@ WHY: all of them can answer this, so capability does not decide, and no
 CONTRACT open_meteo — verified 2026-09-01 (0 days ago) — <span class="g">FRESH</span>
 smoke test: <span class="g">PASS</span></pre>
   <p>When it goes stale or reports drift, run <code>/semantic-recon refresh open_meteo</code>. A refresh reads <code>.contract_id</code> and never re-derives the slug — that would fork the contract. It re-runs only the flagged phases, re-answers the <em>same</em> frozen questions, and produces a semantic diff before anything is overwritten.</p>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>—</b><h2>When not to use this</h2></div>
   <div class="callout">
-    <b>When not to use this</b>
+    <b>The return comes from repetition.</b>
     Not for a one-off query. The cost is paid once and the protection is distributed forever, so the return comes from repetition: build five things on one contract and all five inherit the same traps and refusals without anyone rediscovering them. For a single question, just call the API.
   </div>
 </section>

@@ -42,6 +42,37 @@ reason its author never knew.
 
 ---
 
+## What changes
+
+Same question, same code, same API. The difference is whether a contract exists.
+
+**Without**
+```
+>>> forecast(52.52, 13.41)
+2026-09-01: 22.2 °C
+```
+Which of five models answered? Unknown. Which grid cell — you asked for one and
+got another a kilometre away? Unknown. Comparable to the figure you stored
+yesterday? No way to tell. **Nothing is wrong on the screen.**
+
+**With**
+```
+>>> forecast(52.52, 13.41)
+REFUSED: a forecast request with no explicit model
+INSTEAD: pass models='icon_seamless' …
+
+2026-09-01: 22.2 °C
+— forecast · icon_seamless · grid 52.5200,13.4200 (38 m) · tz Europe/Berlin
+```
+Stopped before the ambiguous call, told exactly how to fix it, and the answer
+names what produced it. **You did not have to know any of that.**
+
+That is the whole trade. You spend an hour once. After that, correctness on this
+system stops depending on whether the next person happens to know the five
+things that matter.
+
+---
+
 ## 1 · Install
 
 ```bash
@@ -133,7 +164,7 @@ claim, compile the code, compile the contract, and audit it clean-room.
 
 ---
 
-## 4 · What you get
+## 4 · What comes out
 
 ```
 ~/contracts/
@@ -195,9 +226,14 @@ refresh is how the contract gets less conservative over time.
 
 ---
 
-## 6 · Using it
+## 6 · Three ways to use what came out
 
-Paste this into any agent that will touch the system:
+Ranked by how little you have to do.
+
+**1 · Paste the bootstrap into any agent** — *no code.*
+Ten lines from `references/downstream.md`. The agent reads the routing table,
+calls the contract's functions instead of the API, and reports refusals instead
+of guessing. Works in any assistant that can read a folder.
 
 ```
 Before querying this system:
@@ -208,9 +244,9 @@ Before querying this system:
 5. Preserve provenance in every substantive answer.
 ```
 
-The full block is in `references/downstream.md`.
-
-**In code**, the contract does the refusing for you:
+**2 · Import the code into what you are building** — *one import.*
+The refusals stop being advice and become structural: they fire whether or not
+anyone read the documentation.
 
 ```python
 from data_contract_open_meteo.code import client, series
@@ -236,16 +272,20 @@ INSTEAD: pass models='icon_seamless' (or ecmwf_ifs025 / gfs_seamless), or pass
 ```
 
 Every refusal carries three things: what was refused, why in one sentence, and
-the correct call ready to copy. Following the messages is how you converge on
-correct usage. In the one test of this so far, a weather skill written with
-**zero refusal logic of its own** was stopped five times, reached working code
-in two rounds of following the messages, and inherited a fact its author never
-knew — that two models resolve to different grid cells.
+the correct call ready to copy.
 
-**Anything a person will read** goes through `format_with_provenance()`. It is
-the only formatter the contract ships, and it cannot omit the source.
+**3 · Point another agent at the folder and let it build** — *the leverage.*
+This is where it compounds. Build five things on one contract and all five
+inherit the same traps, without any of their authors learning them.
 
----
+> **The third way, measured.** We wrote a weather skill with **zero refusal
+> logic of its own** — no checks, no validation, nothing about models or
+> timezones. Its contract stopped it five times. Two rounds of following the
+> messages and it was correct, including for a reason its author never knew:
+> two models resolve to different grid cells.
+
+Anything a person will read goes through `format_with_provenance()`. It is the
+only formatter a contract ships, and it cannot omit the source.
 
 ## 7 · A second system
 

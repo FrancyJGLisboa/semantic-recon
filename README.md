@@ -262,10 +262,19 @@ phase files load only when the run reaches that phase.
 `references/*.md` are **generated**. Edit `references/full-pack.txt`, then:
 
 ```bash
-python3 scripts/split.py
+python3 scripts/split.py        # references/ from full-pack.txt
+python3 scripts/build-docs.py   # docs/*.html from docs/src/
+python3 scripts/check-docs.py   # fails if the walkthrough's two surfaces drift
 ```
 
-Editing the generated files directly loses your change on the next split.
+Editing a generated file directly loses your change on the next build.
+
+`GETTING-STARTED.md` and `docs/src/index.html` tell the same story to different
+readers and neither can be generated from the other without degrading it, so
+they cannot share a source. `check-docs.py` compares their section headings and
+fails on any difference that has not been declared, with a reason, in its
+`EXPECTED_DIFFERENCES` table. When you cannot prevent a divergence, make it
+loud — the same move the contracts make.
 
 ## License
 
