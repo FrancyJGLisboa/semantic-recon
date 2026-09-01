@@ -3,7 +3,7 @@ name: semantic-recon
 description: Run a multi-agent reconnaissance of a target system and compile a slug-scoped data_contract_<id>/ folder that makes future AI agents behave like an SME on it. Use when asked to map, learn, document, or build a contract for an API, MCP server, database, or codebase so other agents can use it correctly; when credentials for a system exist and its semantics must be discovered and verified; or on any invocation like /semantic-recon, "semantic orchestrator", "build a data contract", "make agents SME on this system", "refresh the contract". Enforces frozen holdout questions, blast-radius triage, adversarial falsification, and a validate_query gate that refuses rather than describes.
 license: MIT
 metadata:
-  version: "2.3"
+  version: "2.4"
   pack: Semantic Reconnaissance Multi-Agent Prompt Pack
 ---
 
@@ -74,6 +74,7 @@ Supporting references, read as needed:
 - `references/structure.md` — per-type mandatory probes, output folder layout
 - `references/standards.md` — claim classification, blast radius, evidence rules
 - `references/downstream.md` — bootstrap for consuming agents, refresh runs
+- `references/registry.md` — arbitrating between two contracts that overlap
 - `references/full-pack.txt` — the entire pack in one file
 
 ## Start
@@ -94,6 +95,13 @@ An existing contract is refreshed, never re-derived. Read `.contract_id` first,
 then follow the refresh procedure in `references/downstream.md`. A refresh that
 mints a new slug forks the contract and downstream agents load whichever they
 find first.
+
+## More than one contract
+
+Once two contracts can answer the same question, neither may decide for the
+other. Read `references/registry.md`: capability decides where capability can,
+and a preference nobody declared is escalated to the operator rather than
+guessed. Comparison is allowed; merging is not, and takes no override.
 
 ## Consuming a finished contract
 

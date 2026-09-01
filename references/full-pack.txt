@@ -1,5 +1,5 @@
 SEMANTIC RECONNAISSANCE MULTI-AGENT PROMPT PACK
-Version: 2.3
+Version: 2.4
 Purpose: Discover, learn, falsify, and compile the access mechanics, structure,
 semantics, ontology, business contracts, traps, playbooks, and deterministic code
 needed for a future AI agent to operate a target system correctly WITHOUT
@@ -24,6 +24,8 @@ Changes from v1.0:
 + CONTRACT_ID is DERIVED BY THE AGENT (section 0.1a + 1b), not supplied by the
   operator, using a cheap identity probe and deterministic normalization so the
   same system always yields the same slug.
++ Section 12b: the registry layer, for when two contracts describe overlapping
+  facts. Capability decides where it can; preference escalates to the operator.
 + Section 8.3 class (f): provenance must survive formatting. A contract that
   hands a person a bare number has lost the identity it spent the whole run
   establishing.
@@ -130,7 +132,9 @@ STEP 2 - NORMALIZE (deterministic; same input must always give same output)
       api, service, svc, server, mcp, db, database, data, platform, system,
       the, official, public, rest, graphql, v1, v2, v3, prod, production
   drop a trailing TLD when the name was taken from a domain or a page title:
-      com, io, org, net, dev, ai, app, co, cloud, xyz
+      the final dot-separated label of the domain, whatever it is — gTLD or
+      ccTLD. Do not work from an enumerated list; .no, .se and .br are TLDs
+      exactly as much as .com is, and a list will always be missing one.
       (a system that names itself after its domain asserts the brand, not the
        registrar; keeping the TLD forks the slug the moment another run reads
        the brand from a different surface)
@@ -1342,9 +1346,12 @@ Paste this into any agent that will use the target system.
 
 Before querying this system:
 
-0.  Confirm which contract you need. Check ~/contracts/INDEX.md and load exactly
-    one. If your task spans systems, load each separately and never let a rule
-    from one govern the other. A fragment with no CONTRACT header is
+0.  Confirm which contract you need. If the registry has an arbiter (section
+    12b), ASK IT — do not read the index and choose. Picking by hand is the
+    failure that layer exists to prevent, and the arbiter will refuse rather
+    than guess when the choice is a preference nobody declared. Load exactly
+    one contract. If your task spans systems, load each separately and never
+    let a rule from one govern the other. A fragment with no CONTRACT header is
     unattributed: do not act on it.
 1.  Run <CONTRACT_DIR>/code/contract_health.report(). If it returns EXPIRED or
     DRIFT_DETECTED, state that before answering and do not present results as
@@ -1417,6 +1424,120 @@ Do not overwrite the verified contract until:
 
 Append to <CONTRACT_DIR>/CHANGELOG.md. Never rewrite history there.
 Update last_verified_at on every claim you actually re-verified, and only those.
+
+
+======================================================================
+12b. THE REGISTRY LAYER  (only once you hold more than one contract)
+======================================================================
+
+Everything before this section produces ONE contract. This section is about
+what appears the moment two of them describe overlapping facts, and it is not
+producible by either contract, because the question it answers is above both.
+
+Do not build this speculatively. It is worth writing when, and only when, two
+registered contracts can answer the same question.
+
+----------------------------------------------------------------------
+12b.1 WHY NEITHER CONTRACT CAN DECIDE
+----------------------------------------------------------------------
+
+Two systems covering one domain will disclose different things. Not more or
+less — DIFFERENT. One names the model and hides when it ran; the other names
+the run and hides which cell answered. Each is complete on its own terms and
+neither is complete for a merged series, which inherits the INTERSECTION of
+what they disclose. That intersection is routinely empty.
+
+So a merged value is not an average of two partial provenances. It is a value
+with no provenance at all, wearing the confidence of two systems that agreed.
+
+And they often do agree. That is the trap: agreement reads as permission to
+mix, and it is the weakest possible evidence for it. Two systems can agree
+because they share an upstream model, at one location, on one day, and diverge
+elsewhere by an order of magnitude more than the agreement suggested.
+
+----------------------------------------------------------------------
+12b.2 THE RULE
+----------------------------------------------------------------------
+
+CAPABILITY DECIDES WHERE CAPABILITY CAN DECIDE. EVERYTHING ELSE ESCALATES.
+
+  exactly one contract CAN answer   -> rule for it, and say why the others cannot
+  several can, operator declared    -> rule for the declared one, list the rest
+  several can, nobody declared      -> REFUSE. That decision is the operator's.
+  none can                          -> REFUSE, and say so as a finding
+
+The third row is the whole design. A registry that guesses a preference is
+worse than one that refuses, because a guessed preference is indistinguishable
+from a policy: it will be inherited, cited, and defended by agents that have no
+idea a human never made it.
+
+So the preference table SHIPS EMPTY, and a test asserts that it does. A row in
+it must be a decision somebody made. Capability rows are derived from evidence;
+preference rows are not derivable at all.
+
+----------------------------------------------------------------------
+12b.3 THE CAPABILITY TABLE
+----------------------------------------------------------------------
+
+One row per contract, one column per thing that decides who can answer:
+coverage in time, horizon, which provenance fields exist, which dimensions can
+be pinned, unit vocabulary.
+
+Every cell MUST cite the claim id in that contract which established it. A
+capability table assembled from impressions is a preference table in disguise.
+
+Write the "no" cells with the same care as the "yes" cells. They are what
+produces a CAPABILITY ruling, and a ruling that names why the other contracts
+cannot answer is auditable in a way that "we chose X" never is.
+
+----------------------------------------------------------------------
+12b.4 COMPARE IS ALLOWED. MERGE IS NOT.
+----------------------------------------------------------------------
+
+Provide a comparison that returns every candidate side by side, each with its
+own provenance and an explicit note of which half it is missing. It must not
+reduce them to one number, and there should be no function that does.
+
+Provide a merge function ONLY so that the attempt fails by name, and give it
+NO OVERRIDE. Not the one your contracts use internally, not a force flag.
+
+This is a deliberate asymmetry with section 8.1, where overrides are permitted
+through explicit named arguments. Mixing sources INSIDE one contract is a
+labelled choice that contract is competent to offer about material it owns.
+Choosing between contracts is not a choice either of them may make, so there is
+nothing for an override to unlock. An override here would be a contract
+granting itself authority it does not have.
+
+----------------------------------------------------------------------
+12b.5 HOOKS INTO THE REST OF THE PACK
+----------------------------------------------------------------------
+
+TARGET PROFILER (section 1b)
+  The collision check already compares slugs. Extend it: when a registered
+  contract answers questions about the SAME SUBJECT, that is not a slug
+  collision and must not be discriminated away — it is an authority overlap.
+  Record it in TARGET.md and flag it for this layer.
+
+DOWNSTREAM BOOTSTRAP (section 11)
+  Step 0 becomes: consult the registry's arbiter BEFORE loading a contract. An
+  agent that picks by reading the index and choosing is the failure this layer
+  prevents.
+
+THE CONTRACTS THEMSELVES
+  Each keeps its foreign-data guard. The arbiter decides who answers; the
+  guards ensure that nothing crosses even if the arbiter is bypassed. Two
+  independent mechanisms, because the arbiter is advisory to code that does not
+  call it and the guards are not.
+
+REGISTRY-G1 passes only if:
+- Every capability cell cites the claim that established it.
+- The preference table is empty, or every row in it names who decided and when.
+- A test asserts the preference table cannot be populated by inference.
+- Comparison preserves per-contract provenance and cannot reduce to one value.
+- The merge path takes no override, proven by a test that passes every override
+  the contracts themselves accept.
+- A question that NO contract can answer produces a refusal that says so,
+  rather than the closest available answer.
 
 
 ======================================================================
@@ -1564,5 +1685,5 @@ Final sanity check, to be answered honestly by the Orchestrator:
 
 
 ======================================================================
-END OF PROMPT PACK v2.3
+END OF PROMPT PACK v2.4
 ======================================================================

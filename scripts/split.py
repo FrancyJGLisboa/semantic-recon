@@ -30,6 +30,7 @@ SECTIONS = [
     ('references/agents/09-compiler.md',         '9. CONTRACT COMPILER PROMPT',         'Contract Compiler'),
     ('references/agents/10-auditor.md',          '10. INDEPENDENT FINAL AUDITOR',       'Independent Final Auditor'),
     ('references/downstream.md',                 '11. DOWNSTREAM PRODUCTION AGENT',     'Downstream Bootstrap + Contract Refresh'),
+    ('references/registry.md',                   '12b. THE REGISTRY LAYER',             'The Registry Layer (multiple contracts)'),
     ('references/standards.md',                  '13. OPERATING PRINCIPLES',            'Operating Principles, Claim + Evidence Standards, Completion'),
 ]
 END = 'END OF PROMPT PACK'

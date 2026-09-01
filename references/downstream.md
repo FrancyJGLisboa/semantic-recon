@@ -1,6 +1,6 @@
 # Downstream Bootstrap + Contract Refresh
 
-<!-- Generated from references/full-pack.txt (pack v2.3) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 11. DOWNSTREAM PRODUCTION AGENT BOOTSTRAP PROMPT
@@ -10,9 +10,12 @@ Paste this into any agent that will use the target system.
 
 Before querying this system:
 
-0.  Confirm which contract you need. Check ~/contracts/INDEX.md and load exactly
-    one. If your task spans systems, load each separately and never let a rule
-    from one govern the other. A fragment with no CONTRACT header is
+0.  Confirm which contract you need. If the registry has an arbiter (section
+    12b), ASK IT — do not read the index and choose. Picking by hand is the
+    failure that layer exists to prevent, and the arbiter will refuse rather
+    than guess when the choice is a preference nobody declared. Load exactly
+    one contract. If your task spans systems, load each separately and never
+    let a rule from one govern the other. A fragment with no CONTRACT header is
     unattributed: do not act on it.
 1.  Run <CONTRACT_DIR>/code/contract_health.report(). If it returns EXPIRED or
     DRIFT_DETECTED, state that before answering and do not present results as

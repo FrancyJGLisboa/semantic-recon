@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.4
+- Section 12b, the registry layer: what appears once two contracts describe
+  overlapping facts, and why neither of them can produce it. Capability decides
+  where capability can decide; an undeclared preference is escalated, never
+  guessed, because a guessed preference is indistinguishable from a policy.
+- Comparison preserves per-contract provenance; merging takes no override at
+  all — a deliberate asymmetry with the named overrides of section 8.1.
+- `REGISTRY-G1`. Hooks into the Target Profiler's collision check (subject
+  overlap is not a slug collision) and the downstream bootstrap (consult the
+  arbiter before loading a contract).
+- Found by running the pack a second time, on a system chosen because it
+  overlapped the first. The two agreed within 0.2 C and hid different halves of
+  the provenance.
+
 ## 2.3
 - Section 8.3 gains class (f), human-facing output. A gate can force a caller to
   pass a model and still not force it to say which one answered; every rule

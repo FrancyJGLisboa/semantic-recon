@@ -1,6 +1,6 @@
 # Reference Implementation Engineer
 
-<!-- Generated from references/full-pack.txt (pack v2.3) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 8. REFERENCE IMPLEMENTATION ENGINEER PROMPT

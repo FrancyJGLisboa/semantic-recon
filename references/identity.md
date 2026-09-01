@@ -1,6 +1,6 @@
 # CONTRACT_ID Derivation + Identity Discipline
 
-<!-- Generated from references/full-pack.txt (pack v2.3) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.1a CONTRACT_ID DERIVATION  (owned by the Target Profiler, not the operator)
@@ -38,7 +38,9 @@ STEP 2 - NORMALIZE (deterministic; same input must always give same output)
       api, service, svc, server, mcp, db, database, data, platform, system,
       the, official, public, rest, graphql, v1, v2, v3, prod, production
   drop a trailing TLD when the name was taken from a domain or a page title:
-      com, io, org, net, dev, ai, app, co, cloud, xyz
+      the final dot-separated label of the domain, whatever it is — gTLD or
+      ccTLD. Do not work from an enumerated list; .no, .se and .br are TLDs
+      exactly as much as .com is, and a list will always be missing one.
       (a system that names itself after its domain asserts the brand, not the
        registrar; keeping the TLD forks the slug the moment another run reads
        the brand from a different surface)
