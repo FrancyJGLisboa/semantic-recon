@@ -52,9 +52,10 @@ server, or a repository.
 Use it when the same system will be used repeatedly, by agents, and being
 silently wrong is expensive. Do not use it for a one-off query.
 
-**New here? [GETTING-STARTED.md](GETTING-STARTED.md)** walks the whole path —
-install, the prompt, what comes out, and how to use it — with real output from
-a real run.
+**New here?** → **[francyjglisboa.github.io/semantic-recon](https://francyjglisboa.github.io/semantic-recon/)**
+walks the whole path: install, the prompt, what comes out, and how to use it,
+with real output from a real run. The same text lives in
+[GETTING-STARTED.md](GETTING-STARTED.md) if you would rather read it here.
 
 ## Install
 
@@ -119,6 +120,16 @@ derivation. Confirm there before spending a call budget.
 
 Plus the semantic layer: entities, metrics, dimensions, relationships, temporal
 semantics, business rules, authority policy.
+
+## Docs
+
+| page | what it covers |
+|---|---|
+| [Walkthrough](https://francyjglisboa.github.io/semantic-recon/) | install → prompt → artifacts → using them |
+| [How it works](https://francyjglisboa.github.io/semantic-recon/concepts.html) | the consult-time path, the sealed pipeline, the claim triage grid, where a rule should live |
+
+Source for both is under `docs/`. `GETTING-STARTED.md` is the canonical text for
+the walkthrough; if it and the page ever disagree, the Markdown is right.
 
 ## Layout
 

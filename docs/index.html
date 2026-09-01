@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First Contract · semantic-recon</title>
+<meta name="description" content="Install to working code with semantic-recon, walked through with real output from a run against a public API.">
+<meta property="og:title" content="First Contract">
+<meta property="og:description" content="Install to working code with semantic-recon, walked through with real output from a run against a public API.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#F4F1F0; --surface:#FBFAF9; --sunk:#EDE8E6; --term:#221C1B;
+  --ink:#191413; --muted:#6E6260; --faint:#8C807D; --rule:#DCD3D0;
+  --accent:#9E2B25; --accent-soft:#F2E3E1; --ok:#1F7A5C;
+  --shadow:0 1px 2px rgba(25,20,19,.05), 0 10px 30px -20px rgba(25,20,19,.35);
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Newsreader",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#14100F; --surface:#1D1817; --sunk:#241E1D; --term:#0D0A0A;
+  --ink:#EFE9E7; --muted:#A59793; --faint:#8A7C79; --rule:#332B29;
+  --accent:#E8736A; --accent-soft:#33201E; --ok:#4FBF97;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -20px rgba(0,0,0,.9);
+}}
+:root[data-theme="dark"]{
+  --paper:#14100F; --surface:#1D1817; --sunk:#241E1D; --term:#0D0A0A;
+  --ink:#EFE9E7; --muted:#A59793; --faint:#8A7C79; --rule:#332B29;
+  --accent:#E8736A; --accent-soft:#33201E; --ok:#4FBF97;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -20px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:18px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 26px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2.5rem,7vw,4rem);font-weight:700;letter-spacing:-.035em;line-height:1}
+h2{font-size:clamp(1.4rem,3vw,1.85rem);font-weight:600;letter-spacing:-.022em;line-height:1.15}
+h3{font-size:1rem;font-weight:600;letter-spacing:-.005em;margin-bottom:.4rem}
+p{margin:0 0 1.05em}
+a{color:var(--accent)}
+strong{font-weight:500}
+code{font-family:var(--mono);font-size:.83em;background:var(--sunk);padding:.1em .34em;border-radius:3px}
+
+header{padding:clamp(3.5rem,9vw,6.5rem) 0 clamp(2rem,4vw,3rem)}
+.kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:1.5rem}
+.lede{font-size:1.22rem;line-height:1.5;color:var(--muted);max-width:40ch;margin-top:1.5rem}
+
+.step{padding:clamp(2.4rem,5vw,3.6rem) 0;border-top:1px solid var(--rule)}
+.stepnum{display:flex;align-items:baseline;gap:.85rem;margin-bottom:1.4rem}
+.stepnum b{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.12em;
+  color:var(--accent);flex:none;padding-top:.2rem}
+
+pre{margin:1.3rem 0;padding:1.05rem 1.2rem;background:var(--term);color:#E6DEDB;
+  border-radius:3px;overflow-x:auto;font-family:var(--mono);font-size:.79rem;
+  line-height:1.62;box-shadow:var(--shadow)}
+pre .c{color:#8B7E7B}
+pre .g{color:#5FCFA4}
+pre .r{color:#F0837A}
+pre .y{color:#D9A94C}
+pre.light{background:var(--surface);color:var(--ink);border:1px solid var(--rule)}
+
+.refusal{margin:1.3rem 0;padding:1.05rem 1.2rem;background:var(--accent-soft);
+  border-left:3px solid var(--accent);border-radius:0 3px 3px 0;
+  font-family:var(--mono);font-size:.78rem;line-height:1.65;overflow-x:auto}
+.refusal b{font-weight:600;color:var(--accent)}
+
+table{border-collapse:collapse;width:100%;margin:1.5rem 0;font-size:.95rem}
+th{text-align:left;font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--faint);font-weight:500;
+  padding:0 1rem .55rem 0;border-bottom:1px solid var(--rule)}
+td{padding:.62rem 1rem .62rem 0;border-bottom:1px solid var(--rule);vertical-align:top}
+td:first-child{font-family:var(--mono);font-size:.78rem;white-space:nowrap;width:1%}
+td.wide:first-child{white-space:normal;width:auto}
+
+.callout{margin:1.6rem 0;padding:1.1rem 1.3rem;background:var(--surface);
+  border:1px solid var(--rule);border-radius:3px;font-size:.96rem;line-height:1.55}
+.callout b{font-family:var(--display);font-weight:600;display:block;margin-bottom:.3rem}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin:1.6rem 0}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.half{padding:1.05rem 1.2rem;border:1px solid var(--rule);border-radius:3px;background:var(--surface)}
+.half h3{font-family:var(--mono);font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--faint);font-weight:500}
+.half ul{margin:.5rem 0 0;padding-left:1.1rem;font-size:.92rem;line-height:1.5;color:var(--muted)}
+.half li{margin-bottom:.4rem}
+.half.hot{border-color:var(--accent);background:var(--accent-soft)}
+.half.hot h3{color:var(--accent)}
+.half.hot ul{color:var(--ink)}
+
+.pull{margin:2.2rem 0;padding:1.3rem 0 1.3rem 1.4rem;border-left:3px solid var(--accent);
+  font-family:var(--display);font-weight:500;font-size:1.16rem;line-height:1.38;
+  letter-spacing:-.014em;max-width:34ch}
+
+footer{padding:3rem 0 5rem;border-top:1px solid var(--rule);color:var(--faint);font-size:.9rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.sitenav{position:sticky;top:0;z-index:10;display:flex;gap:1.5rem;align-items:center;
+  padding:.85rem 26px;background:var(--paper);border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.09em;text-transform:uppercase}
+.sitenav a{color:var(--muted);text-decoration:none;padding-bottom:2px;border-bottom:1px solid transparent}
+.sitenav a:hover{color:var(--ink)}
+.sitenav a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+.sitenav a:last-child{margin-left:auto}
+.sitenav a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style>
+
+<nav class="sitenav">
+  <a href="./" aria-current="page">Walkthrough</a>
+  <a href="./concepts.html" >How it works</a>
+  <a href="https://github.com/FrancyJGLisboa/semantic-recon">GitHub</a>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">semantic-recon · walkthrough</div>
+  <h1>Your first<br>contract</h1>
+  <p class="lede">Install to working code, with real output from a real run against a public API you can reproduce yourself.</p>
+</header>
+
+<section class="step">
+  <div class="stepnum"><b>01</b><h2>Install</h2></div>
+  <pre><span class="c">$</span> git clone https://github.com/FrancyJGLisboa/semantic-recon.git
+<span class="c">$</span> cd semantic-recon &amp;&amp; ./scripts/install.sh
+
+Claude Code    linked  -&gt; ~/.claude/skills/semantic-recon
+Codex CLI      linked  -&gt; ~/.codex/skills/semantic-recon
+Copilot CLI    linked  -&gt; ~/.copilot/skills/semantic-recon
+registry       created -&gt; ~/contracts/INDEX.md</pre>
+  <p>All three CLIs read the same <code>&lt;config&gt;/skills/&lt;name&gt;/SKILL.md</code> layout, so one source installs to whichever you have. It symlinks — <code>git pull</code> updates every one of them at once.</p>
+  <p>In Claude Code, type <code>/</code> and look for <code>semantic-recon</code>. It appears without restarting.</p>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>02</b><h2>The prompt</h2></div>
+  <pre class="light">/semantic-recon
+
+TARGET_TYPE:            DATA_API
+TARGET_LOCATION:        https://api.open-meteo.com
+BLAST_RADIUS_OF_MISUSE: Test run, no production consumer.
+OUT_OF_SCOPE:           Everything except Forecast and Historical Archive.
+CALL_BUDGET:            120</pre>
+  <p>Two fields are yours. Everything else is determined for you — <strong>including the contract's name.</strong> You never pick a slug.</p>
+  <table>
+    <thead><tr><th>Field</th><th>Why it has to be you</th></tr></thead>
+    <tbody>
+      <tr><td>BLAST_RADIUS_<br>OF_MISUSE</td><td>Only you know what breaks in your business if an agent gets this system wrong.</td></tr>
+      <tr><td>OUT_OF_SCOPE</td><td>Only you know where this run should stop.</td></tr>
+    </tbody>
+  </table>
+  <p><code>TARGET_TYPE</code> is one of <code>DATA_API</code>, <code>DATABASE</code>, <code>MCP_SERVER</code>, <code>CODEBASE</code>. With credentials, add the <em>variable name</em> — never the value:</p>
+  <pre class="light">CREDENTIALS_AVAILABLE:  yes, via $MYSYSTEM_TOKEN
+WRITE_ACCESS:           read-only</pre>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>03</b><h2>It stops after phase 1, on purpose</h2></div>
+  <p>The first phase costs at most three operations and hands back a proposed name with the derivation that produced it. Confirm before it spends the call budget.</p>
+  <pre>contract_id_derivation:
+  raw_name:            <span class="y">"Open-Meteo.com"</span>
+  source:              &lt;title&gt; of https://open-meteo.com/en/docs
+  normalized_to:       <span class="g">open_meteo</span>
+  collision_checked:   yes — against ~/contracts/INDEX.md
+  escalated_to_human:  no</pre>
+  <p>The slug is derived deterministically from what the system calls itself, so two runs on one system never fork into two contracts. After you say <code>continue</code>, the name is frozen — it appears in the folder, the Python package, and every file header.</p>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>04</b><h2>What comes out</h2></div>
+  <pre>~/contracts/data_contract_open_meteo/
+├── <span class="g">AGENT_INSTRUCTIONS.md</span>   ← start here. Written to be the only file read
+├── PLAYBOOKS.md           recipes by question shape
+├── TRAPS.md               wrong value beside right value
+├── UNCERTAINTIES.md       questions only a human can answer
+├── AUTHORITY_POLICY.md    which value governs when several exist
+├── code/                  client · validators · series · health
+├── tests/                 every trap is a regression test
+└── evidence/              frozen questions, observations, counterexamples, audit</pre>
+
+  <div class="two">
+    <div class="half">
+      <h3>Reconstructible</h3>
+      <ul>
+        <li>ENTITIES · METRICS</li>
+        <li>ACCESS · DIMENSIONS</li>
+        <li>SOURCES</li>
+      </ul>
+      <p style="font-size:.9rem;color:var(--muted);margin:.7rem 0 0">A competent agent could rebuild most of this from the vendor's docs. Useful, saves time, not rare.</p>
+    </div>
+    <div class="half hot">
+      <h3>The point</h3>
+      <ul>
+        <li>TRAPS · UNCERTAINTIES</li>
+        <li>AUTHORITY_POLICY</li>
+        <li>counterexamples · validators</li>
+      </ul>
+      <p style="font-size:.9rem;margin:.7rem 0 0">None of it exists without having probed the system. This is the half nobody can reconstruct at any effort.</p>
+    </div>
+  </div>
+
+  <p>From the real Open-Meteo run, <strong>none of these five appear anywhere in Open-Meteo's own documentation</strong> — and not by omission. To the people who built it, none of them is a surprise.</p>
+  <table>
+    <tbody>
+      <tr><td class="wide">Two products, one date</td><td>Archive says 23.4&nbsp;°C, forecast says 24.2&nbsp;°C — different grid cells, different models, both HTTP&nbsp;200.</td></tr>
+      <tr><td class="wide">timezone changes values</td><td>Tokyo rainfall: 4.1&nbsp;mm in UTC, 1.2&nbsp;mm in Asia/Tokyo. Temperature is identical either way, so a temperature spot-check "proves" it does not matter.</td></tr>
+      <tr><td class="wide">A typo returns 200</td><td>Unknown parameters are silently ignored, so a misspelled <code>timezone</code> quietly applies the default.</td></tr>
+      <tr><td class="wide">The archive is not all ERA5</td><td>ERA5 stops ~5 days short; the default fills the gap from an unnamed source with no seam marker.</td></tr>
+      <tr><td class="wide">best_match is a choice</td><td>A per-location selection, never reported, 1.7&nbsp;°C of spread between models.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>05</b><h2>Reading the verdict</h2></div>
+  <table>
+    <tbody>
+      <tr><td>PASS</td><td>Clean-room agent answered the frozen questions correctly, nothing unresolved.</td></tr>
+      <tr><td>PASS_WITH_<br>UNRESOLVED_ITEMS</td><td>Correct, but some questions need a human or the vendor.</td></tr>
+      <tr><td>FAIL</td><td>Do not use it yet. The report says why.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <b>The middle one is normal, and is not a defect.</b>
+    It means the contract will be correct but <em>conservative</em> — it refuses where a fully-resolved contract would answer. Each unresolved item carries a precise question and an owner. Answering them and refreshing is how a contract gets less conservative over time.
+  </div>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>06</b><h2>Using it</h2></div>
+  <pre>from data_contract_open_meteo.code import client, series
+
+res = client.query({<span class="y">"product"</span>: <span class="y">"forecast"</span>, <span class="y">"latitude"</span>: 52.52, <span class="y">"longitude"</span>: 13.41,
+                    <span class="y">"daily"</span>: <span class="y">"temperature_2m_max"</span>, <span class="y">"timezone"</span>: <span class="y">"UTC"</span>,
+                    <span class="y">"models"</span>: <span class="y">"icon_seamless"</span>, <span class="y">"forecast_days"</span>: 3})
+
+print(series.format_with_provenance(res[0][<span class="y">"daily"</span>][<span class="y">"temperature_2m_max"</span>]))
+<span class="c">
+2026-09-01: 22.2 °C
+2026-09-02: 21.8 °C
+— source: forecast · icon_seamless · grid 52.5200,13.4200 (38 m) · tz GMT</span></pre>
+  <p>Leave out <code>models</code> and it stops you:</p>
+  <div class="refusal"><b>REFUSED:</b> a forecast request with no explicit model<br>
+  <b>WHY:</b> best_match selects a model per location, never reports which, and the spread across models reached 1.7 C at a 3-day horizon (U-02, CE-06)<br>
+  <b>INSTEAD:</b> pass models='icon_seamless' (or ecmwf_ifs025 / gfs_seamless), or pass allow_best_match=True for a single casual lookup you will label</div>
+  <p>Every refusal carries three things: what was refused, why in one sentence, and the correct call ready to copy. Following the messages is how you converge on correct usage — a skill written with <strong>zero refusal logic of its own</strong> reached working code in two rounds of doing exactly that, and inherited a fact its author never knew.</p>
+  <p>Anything a person will read goes through <code>format_with_provenance()</code>. It is the only formatter the contract ships, and it cannot omit the source.</p>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>07</b><h2>A second system</h2></div>
+  <p>Run the skill again; the profiler checks for collisions itself. Once two contracts can answer the same question, an arbiter appears above them. Ask it rather than choosing.</p>
+  <pre>authority.route({<span class="y">"date"</span>: date(2019, 3, 15)})
+<span class="g">&lt;Ruling open_meteo by CAPABILITY: the only registered contract that can
+ answer: met_locationforecast does not serve dates before today&gt;</span>
+
+authority.route({<span class="y">"date"</span>: date(2026, 9, 3)}, country=<span class="y">"NO"</span>)
+<span class="r">REFUSED: choosing between met_locationforecast, open_meteo
+WHY: all of them can answer this, so capability does not decide, and no
+     operator preference is declared ...</span></pre>
+  <div class="pull">A guessed preference is indistinguishable from a policy. It gets inherited, cited, and defended by agents that have no idea a human never made it.</div>
+  <p>So capability decides where capability can, and the rest comes back to you. Comparing two contracts is allowed. Merging them is not, and takes no override.</p>
+</section>
+
+<section class="step">
+  <div class="stepnum"><b>08</b><h2>Keeping it true</h2></div>
+  <pre>&gt;&gt;&gt; contract_health.report()
+CONTRACT open_meteo — verified 2026-09-01 (0 days ago) — <span class="g">FRESH</span>
+smoke test: <span class="g">PASS</span></pre>
+  <p>When it goes stale or reports drift, run <code>/semantic-recon refresh open_meteo</code>. A refresh reads <code>.contract_id</code> and never re-derives the slug — that would fork the contract. It re-runs only the flagged phases, re-answers the <em>same</em> frozen questions, and produces a semantic diff before anything is overwritten.</p>
+  <div class="callout">
+    <b>When not to use this</b>
+    Not for a one-off query. The cost is paid once and the protection is distributed forever, so the return comes from repetition: build five things on one contract and all five inherit the same traps and refusals without anyone rediscovering them. For a single question, just call the API.
+  </div>
+</section>
+
+<footer>
+  <div>Canonical text: <a href="https://github.com/FrancyJGLisboa/semantic-recon/blob/main/GETTING-STARTED.md">GETTING-STARTED.md</a> in the repo. This page is its companion — if the two ever disagree, the repo is right.</div>
+</footer>
+
+</div>
+
+</body>
+</html>

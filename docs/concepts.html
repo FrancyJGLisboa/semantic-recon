@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semantic Reconnaissance · semantic-recon</title>
+<meta name="description" content="Five representations of the semantic reconnaissance system: the consult-time path, the sealed pipeline, the claim triage grid, and where a rule should live.">
+<meta property="og:title" content="Semantic Reconnaissance">
+<meta property="og:description" content="Five representations of the semantic reconnaissance system: the consult-time path, the sealed pipeline, the claim triage grid, and where a rule should live.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#F4F1F0; --surface:#FBFAF9; --sunk:#EDE8E6;
+  --ink:#191413; --muted:#6E6260; --faint:#8C807D; --rule:#DCD3D0;
+  --accent:#9E2B25; --accent-soft:#F2E3E1;
+  --discovered:#1F7A5C; --inferred:#2C5FA0; --declared:#6A4C93; --unresolved:#A9761B;
+  --shadow:0 1px 2px rgba(25,20,19,.05), 0 8px 24px -16px rgba(25,20,19,.28);
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Newsreader",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14100F; --surface:#1D1817; --sunk:#241E1D;
+    --ink:#EFE9E7; --muted:#A59793; --faint:#8A7C79; --rule:#332B29;
+    --accent:#E8736A; --accent-soft:#33201E;
+    --discovered:#4FBF97; --inferred:#77A9E8; --declared:#B39AE0; --unresolved:#E0A94A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14100F; --surface:#1D1817; --sunk:#241E1D;
+  --ink:#EFE9E7; --muted:#A59793; --faint:#8A7C79; --rule:#332B29;
+  --accent:#E8736A; --accent-soft:#33201E;
+  --discovered:#4FBF97; --inferred:#77A9E8; --declared:#B39AE0; --unresolved:#E0A94A;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:18px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin:0 auto; padding:0 28px}
+.col{max-width:660px}
+h1,h2,h3{font-family:var(--display); text-wrap:balance; margin:0}
+h1{font-size:clamp(2.6rem,6.4vw,4.4rem); font-weight:700; letter-spacing:-.035em; line-height:.98}
+h2{font-size:clamp(1.7rem,3.4vw,2.35rem); font-weight:600; letter-spacing:-.024em; line-height:1.1}
+h3{font-size:1.05rem; font-weight:600; letter-spacing:-.008em}
+p{margin:0 0 1.05em}
+a{color:var(--accent)}
+strong{font-weight:500; color:var(--ink)}
+em{font-style:italic}
+code,.mono{font-family:var(--mono); font-size:.82em; letter-spacing:-.01em}
+code{background:var(--sunk); padding:.1em .34em; border-radius:3px}
+
+.eyebrow{
+  font-family:var(--mono); font-size:.68rem; font-weight:500;
+  letter-spacing:.19em; text-transform:uppercase; color:var(--faint);
+  display:flex; align-items:center; gap:.85em; margin-bottom:1.1rem;
+}
+.eyebrow::after{content:""; flex:1; height:1px; background:var(--rule)}
+
+/* ---------- masthead ---------- */
+header{padding:clamp(4rem,10vw,7.5rem) 0 clamp(2.5rem,5vw,4rem); border-bottom:1px solid var(--rule)}
+.kicker{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:1.6rem;
+}
+.lede{font-size:1.3rem; line-height:1.5; color:var(--muted); max-width:38ch; margin-top:1.6rem}
+.thesis{
+  margin-top:2.8rem; padding:1.4rem 0 0; border-top:2px solid var(--ink);
+  max-width:52ch; font-size:1.06rem;
+}
+.thesis b{font-family:var(--display); font-weight:600}
+
+section{padding:clamp(3.4rem,7vw,5.6rem) 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+.intro{margin-bottom:2.6rem}
+
+/* ---------- figures ---------- */
+figure{margin:2.4rem 0 0; padding:0}
+figure svg{display:block; width:100%; height:auto; max-width:100%; color:var(--ink)}
+.figbox{
+  background:var(--surface); border:1px solid var(--rule); border-radius:2px;
+  padding:clamp(1.1rem,3vw,2rem); overflow-x:auto; box-shadow:var(--shadow);
+}
+figcaption{
+  margin-top:1rem; font-size:.92rem; line-height:1.55; color:var(--muted); max-width:64ch;
+}
+figcaption b{color:var(--ink); font-weight:500}
+
+/* ---------- triage grid ---------- */
+.gridwrap{overflow-x:auto; margin-top:2.2rem}
+table.triage{border-collapse:collapse; width:100%; min-width:660px}
+table.triage th, table.triage td{border:1px solid var(--rule); padding:0; text-align:left; vertical-align:top}
+table.triage thead th{
+  background:transparent; border:0; border-bottom:1px solid var(--rule);
+  padding:0 0 .7rem .9rem; font-family:var(--mono); font-size:.68rem;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--faint); font-weight:500;
+}
+table.triage thead th.sev1{color:var(--accent)}
+table.triage tbody th{
+  border:0; border-right:1px solid var(--rule); padding:1rem .9rem 1rem 0;
+  width:1%; white-space:nowrap;
+}
+.stat{font-family:var(--mono); font-size:.72rem; font-weight:600; letter-spacing:.09em; display:block}
+.stat + span{font-family:var(--body); font-size:.8rem; color:var(--faint); display:block; margin-top:.15rem}
+.s-dis{color:var(--discovered)} .s-inf{color:var(--inferred)}
+.s-dec{color:var(--declared)}  .s-unr{color:var(--unresolved)}
+td.cell{border:0; border-left:1px solid var(--rule); border-top:1px solid var(--rule)}
+.cellbtn{
+  display:block; width:100%; text-align:left; background:none; border:0; cursor:pointer;
+  font-family:var(--display); font-size:.95rem; font-weight:600; color:var(--ink);
+  padding:1rem .95rem 1.05rem; line-height:1.25; letter-spacing:-.01em;
+  border-left:3px solid transparent; transition:background .12s, border-color .12s;
+}
+.cellbtn:hover{background:var(--sunk)}
+.cellbtn:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.cellbtn[aria-pressed="true"]{background:var(--accent-soft); border-left-color:var(--accent)}
+.cellbtn .tick{
+  display:block; font-family:var(--mono); font-size:.63rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--faint); font-weight:500; margin-top:.4rem;
+}
+.cellbtn[aria-pressed="true"] .tick{color:var(--accent)}
+.readout{
+  margin-top:1.5rem; padding:1.15rem 1.3rem; background:var(--surface);
+  border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:2px;
+  font-size:1rem; line-height:1.55; min-height:5.2rem;
+}
+.readout .rlabel{
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--faint); display:block; margin-bottom:.5rem;
+}
+
+/* ---------- vocabulary switcher ---------- */
+.tabs{display:flex; flex-wrap:wrap; gap:.4rem; margin:2rem 0 1.5rem}
+.tab{
+  font-family:var(--mono); font-size:.72rem; font-weight:500; letter-spacing:.1em;
+  text-transform:uppercase; padding:.5rem .85rem; cursor:pointer;
+  background:transparent; color:var(--muted);
+  border:1px solid var(--rule); border-radius:2px; transition:all .12s;
+}
+.tab:hover{color:var(--ink); border-color:var(--faint)}
+.tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.tab[aria-selected="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.vocabwrap{overflow-x:auto}
+table.vocab{border-collapse:collapse; width:100%; min-width:520px; font-size:.95rem}
+table.vocab th{
+  text-align:left; font-family:var(--mono); font-size:.66rem; font-weight:500;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--faint);
+  padding:0 1.2rem .6rem 0; border-bottom:1px solid var(--rule);
+}
+table.vocab td{padding:.6rem 1.2rem .6rem 0; border-bottom:1px solid var(--rule); vertical-align:top}
+table.vocab td.concept{
+  font-family:var(--mono); font-size:.75rem; color:var(--muted);
+  white-space:nowrap; width:1%; letter-spacing:.02em;
+}
+table.vocab td.bound{color:var(--ink)}
+
+/* ---------- refusal list ---------- */
+ol.refusals{list-style:none; counter-reset:r; padding:0; margin:2.2rem 0 0; display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule)}
+ol.refusals li{counter-increment:r; background:var(--surface); padding:.95rem 1.1rem; display:flex; gap:1rem; align-items:baseline}
+ol.refusals li::before{
+  content:counter(r,decimal-leading-zero); font-family:var(--mono); font-size:.7rem;
+  color:var(--faint); flex:none; padding-top:.15rem;
+}
+.rname{font-family:var(--mono); font-size:.78rem; font-weight:600; color:var(--accent); display:block}
+.rwhat{font-size:.94rem; color:var(--muted); display:block; margin-top:.15rem; line-height:1.45}
+
+/* ---------- callouts ---------- */
+.pull{
+  margin:2.6rem 0; padding:1.5rem 0 1.5rem 1.5rem; border-left:3px solid var(--accent);
+  font-family:var(--display); font-weight:500; font-size:1.22rem; line-height:1.35;
+  letter-spacing:-.015em; max-width:32ch;
+}
+.note{font-size:.95rem; color:var(--muted); max-width:62ch}
+
+footer{padding:3.5rem 0 5rem; color:var(--faint); font-size:.88rem}
+footer a{color:var(--muted)}
+footer .mono{display:block; margin-top:.5rem}
+
+@media (max-width:640px){
+  body{font-size:17px}
+  .cellbtn{font-size:.86rem; padding:.8rem .7rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
+
+.sitenav{position:sticky;top:0;z-index:10;display:flex;gap:1.5rem;align-items:center;
+  padding:.85rem 26px;background:var(--paper);border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.09em;text-transform:uppercase}
+.sitenav a{color:var(--muted);text-decoration:none;padding-bottom:2px;border-bottom:1px solid transparent}
+.sitenav a:hover{color:var(--ink)}
+.sitenav a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+.sitenav a:last-child{margin-left:auto}
+.sitenav a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style>
+
+<nav class="sitenav">
+  <a href="./" >Walkthrough</a>
+  <a href="./concepts.html" aria-current="page">How it works</a>
+  <a href="https://github.com/FrancyJGLisboa/semantic-recon">GitHub</a>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">Semantic Reconnaissance &middot; pack v2.1</div>
+  <h1>What an agent<br>knows at the<br>moment it acts</h1>
+  <p class="lede">A system for turning an unfamiliar API, database, MCP server, or codebase into a contract that changes how every agent afterward behaves.</p>
+  <div class="thesis">
+    <p style="margin:0"><b>A contract is not successful because it is complete.</b> It is successful because it changes the behavior of the agent that consults it. Everything below follows from taking that seriously — and from noticing that most documentation fails not by being wrong, but by not being read at the moment it mattered.</p>
+  </div>
+</header>
+
+<section>
+  <div class="col intro">
+    <div class="eyebrow">The gap</div>
+    <h2>Knowing is not doing</h2>
+    <p>An agent under context pressure reads one file and starts working. Every rule that lives only in the other eleven files is, functionally, a rule that does not exist.</p>
+    <p>So the design question is not <em>what should the contract contain</em>. It is: along the path an agent actually walks, where can a wrong answer still escape — and what stands in its way?</p>
+  </div>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 1020 340" role="img" aria-label="Two paths from a question to an answer. Without a contract, the agent calls the system directly and returns a plausible but wrong number. With a contract, the request passes through a registry, a health check, a routing table, and a validator gate that either returns a provenance-bearing answer or refuses.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/>
+          </marker>
+        </defs>
+
+        <!-- question -->
+        <rect x="8" y="132" width="104" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="60" y="156" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor" style="font-family:var(--display)">Question</text>
+        <text x="60" y="172" text-anchor="middle" font-size="10" style="font-family:var(--mono);fill:var(--faint)">from a user</text>
+
+        <!-- unguarded path -->
+        <line x1="112" y1="145" x2="700" y2="70" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arR)" opacity=".85" style="stroke:var(--accent)"/>
+        <text x="330" y="86" font-size="10.5" letter-spacing=".05em" style="font-family:var(--mono);fill:var(--accent)">calls the system directly</text>
+        <rect x="706" y="44" width="212" height="52" rx="2" stroke-width="1.5" style="fill:var(--accent-soft);stroke:var(--accent)"/>
+        <text x="812" y="68" text-anchor="middle" font-size="13" font-weight="600" style="font-family:var(--display);fill:var(--accent)">A plausible number</text>
+        <text x="812" y="84" text-anchor="middle" font-size="10" style="font-family:var(--mono);fill:var(--accent)">no error raised</text>
+
+        <!-- guarded path -->
+        <line x1="112" y1="166" x2="152" y2="196" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+        <rect x="156" y="176" width="118" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="215" y="199" text-anchor="middle" font-size="10.5" font-weight="600" fill="currentColor" style="font-family:var(--mono)">INDEX.md</text>
+        <text x="215" y="215" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">pick one contract</text>
+
+        <rect x="300" y="176" width="118" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="359" y="199" text-anchor="middle" font-size="10.5" font-weight="600" fill="currentColor" style="font-family:var(--mono)">health</text>
+        <text x="359" y="215" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">stale? drifted?</text>
+
+        <rect x="444" y="176" width="118" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="503" y="199" text-anchor="middle" font-size="10.5" font-weight="600" fill="currentColor" style="font-family:var(--mono)">routing</text>
+        <text x="503" y="215" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">playbook · traps</text>
+
+        <rect x="588" y="168" width="132" height="68" rx="2" stroke="currentColor" stroke-width="2.5" style="fill:var(--sunk)"/>
+        <text x="654" y="194" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor" style="font-family:var(--mono)">validate_query</text>
+        <text x="654" y="210" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">8 refusal classes</text>
+        <text x="654" y="226" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">raises, never warns</text>
+
+        <line x1="274" y1="202" x2="296" y2="202" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+        <line x1="418" y1="202" x2="440" y2="202" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+        <line x1="562" y1="202" x2="584" y2="202" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+
+        <!-- outcomes -->
+        <path d="M720 186 L 760 152 L 900 152" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+        <text x="762" y="144" font-size="10" style="font-family:var(--mono);fill:var(--faint)">passes</text>
+        <rect x="906" y="128" width="106" height="48" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="959" y="150" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor" style="font-family:var(--display)">Answer</text>
+        <text x="959" y="165" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">+ provenance</text>
+
+        <path d="M720 218 L 760 258 L 900 258" fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+        <text x="762" y="276" font-size="10" style="font-family:var(--mono);fill:var(--faint)">refuses</text>
+        <rect x="906" y="234" width="106" height="48" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <text x="959" y="256" text-anchor="middle" font-size="12.5" font-weight="600" fill="currentColor" style="font-family:var(--display)">Refusal</text>
+        <text x="959" y="271" text-anchor="middle" font-size="9.5" style="font-family:var(--mono);fill:var(--faint)">+ the right call</text>
+
+        <line x1="8" y1="308" x2="1012" y2="308" stroke-width="1" style="stroke:var(--rule)"/>
+        <text x="8" y="330" font-size="10" style="font-family:var(--mono);fill:var(--faint)">Dashed: the path taken when nothing stands in the way. Solid: the path the contract installs.</text>
+      </svg>
+    </div>
+    <figcaption><b>The gate is the only part that works on an agent that read nothing.</b> Documentation is passive — it protects the careful agent. A validator that raises protects every agent, including the one that skipped straight to the call. If a silently wrong result can be produced through the public code surface, that is a defect in the code layer, not a documentation gap.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="col intro">
+    <div class="eyebrow">The pipeline</div>
+    <h2>The exam is written before the studying</h2>
+    <p>Eleven phases run in order, each behind a gate. One of them is sealed off from the rest, and that seal is the load-bearing structural decision in the whole system.</p>
+    <p>If the final auditor writes its own questions after discovery, it will write questions the contract happens to answer. The audit becomes theater. So the questions are frozen first, by an agent that knows almost nothing, and handed directly to the auditor — over the heads of every phase in between.</p>
+  </div>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 1020 296" role="img" aria-label="A pipeline of eleven phases. Phase 2, the holdout question author, sends a sealed envelope in an arc over phases 3 through 9 directly to phase 10, the independent auditor, never touching the discovery phases in between.">
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ar2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill:var(--unresolved)"/>
+          </marker>
+        </defs>
+
+        <!-- sealed arc -->
+        <path d="M118 148 C 200 34, 800 34, 878 148" fill="none" stroke-width="2" marker-end="url(#ar2a)" style="stroke:var(--unresolved)"/>
+        <rect x="424" y="30" width="176" height="26" rx="2" stroke-width="1.4" style="fill:var(--paper);stroke:var(--unresolved)"/>
+        <text x="512" y="47" text-anchor="middle" font-size="10.5" font-weight="600" style="font-family:var(--mono);fill:var(--unresolved)">SEALED · 20 questions</text>
+        <text x="512" y="76" text-anchor="middle" font-size="10" style="font-family:var(--mono);fill:var(--faint)">discovery phases never read this</text>
+
+        <!-- phase blocks -->
+        <g font-size="9.5" style="font-family:var(--mono)">
+          <rect x="8" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="16" y="167" font-size="9" style="fill:var(--faint)">01</text>
+          <text x="16" y="184" font-size="10.5" font-weight="600" fill="currentColor">Profiler</text>
+          <text x="16" y="198" style="fill:var(--faint)">slug · scope</text>
+
+          <rect x="108" y="150" width="92" height="58" rx="2" fill="none" stroke-width="2" style="stroke:var(--unresolved)"/>
+          <text x="116" y="167" font-size="9" style="fill:var(--unresolved)">02</text>
+          <text x="116" y="184" font-size="10.5" font-weight="600" style="fill:var(--unresolved)">Holdout</text>
+          <text x="116" y="198" style="fill:var(--unresolved)">the exam</text>
+
+          <rect x="208" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="216" y="167" font-size="9" style="fill:var(--faint)">03</text>
+          <text x="216" y="184" font-size="10.5" font-weight="600" fill="currentColor">Access</text>
+          <text x="216" y="198" style="fill:var(--faint)">how to reach</text>
+
+          <rect x="308" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="316" y="167" font-size="9" style="fill:var(--faint)">04</text>
+          <text x="316" y="184" font-size="10.5" font-weight="600" fill="currentColor">Schema</text>
+          <text x="316" y="198" style="fill:var(--faint)">structure</text>
+
+          <rect x="408" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="416" y="167" font-size="9" style="fill:var(--faint)">05</text>
+          <text x="416" y="184" font-size="10.5" font-weight="600" fill="currentColor">Semantics</text>
+          <text x="416" y="198" style="fill:var(--faint)">meaning</text>
+
+          <rect x="508" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="516" y="167" font-size="9" style="fill:var(--faint)">06</text>
+          <text x="516" y="184" font-size="10.5" font-weight="600" fill="currentColor">Business</text>
+          <text x="516" y="198" style="fill:var(--faint)">legitimacy</text>
+
+          <rect x="608" y="150" width="92" height="58" rx="2" stroke-width="2" style="fill:var(--accent-soft);stroke:var(--accent)"/>
+          <text x="616" y="167" font-size="9" style="fill:var(--accent)">07</text>
+          <text x="616" y="184" font-size="10.5" font-weight="600" style="fill:var(--accent)">Red team</text>
+          <text x="616" y="198" style="fill:var(--accent)">falsify</text>
+
+          <rect x="708" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="716" y="167" font-size="9" style="fill:var(--faint)">08</text>
+          <text x="716" y="184" font-size="10.5" font-weight="600" fill="currentColor">Code</text>
+          <text x="716" y="198" style="fill:var(--faint)">the gate</text>
+
+          <rect x="808" y="150" width="92" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <text x="816" y="167" font-size="9" style="fill:var(--faint)">09</text>
+          <text x="816" y="184" font-size="10.5" font-weight="600" fill="currentColor">Compile</text>
+          <text x="816" y="198" style="fill:var(--faint)">playbooks</text>
+
+          <rect x="908" y="150" width="104" height="58" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+          <text x="916" y="167" font-size="9" style="fill:var(--faint)">10</text>
+          <text x="916" y="184" font-size="10.5" font-weight="600" fill="currentColor">Audit</text>
+          <text x="916" y="198" style="fill:var(--faint)">clean room</text>
+        </g>
+
+        <g stroke="currentColor" stroke-width="1.2" marker-end="url(#ar2)">
+          <line x1="100" y1="179" x2="105" y2="179"/><line x1="200" y1="179" x2="205" y2="179"/>
+          <line x1="300" y1="179" x2="305" y2="179"/><line x1="400" y1="179" x2="405" y2="179"/>
+          <line x1="500" y1="179" x2="505" y2="179"/><line x1="600" y1="179" x2="605" y2="179"/>
+          <line x1="700" y1="179" x2="705" y2="179"/><line x1="800" y1="179" x2="805" y2="179"/>
+          <line x1="900" y1="179" x2="905" y2="179"/>
+        </g>
+
+        <!-- gates -->
+        <line x1="8" y1="232" x2="1012" y2="232" stroke-width="1" style="stroke:var(--rule)"/>
+        <g font-size="8.6" letter-spacing=".04em" style="font-family:var(--mono);fill:var(--faint)">
+          <text x="12" y="250">IDENTITY</text>
+          <text x="112" y="250">HOLDOUT</text>
+          <text x="212" y="250">ACCESS</text>
+          <text x="312" y="250">SCHEMA</text>
+          <text x="412" y="250">SEMANTICS</text>
+          <text x="512" y="250">BUSINESS</text>
+          <text x="612" y="250">TRAPS</text>
+          <text x="712" y="250">ENFORCE</text>
+          <text x="812" y="250">PLAYBOOK</text>
+          <text x="912" y="250">FINAL</text>
+        </g>
+        <text x="8" y="278" font-size="10" style="font-family:var(--mono);fill:var(--faint)">Each phase is held by its gate. A failed gate stops the run; it does not downgrade to a warning.</text>
+      </svg>
+    </div>
+    <figcaption><b>Phase 7 exists to attack phases 4 through 6.</b> Nothing is promoted to verified because it looks right — a rule is verified only after someone tried to falsify it and failed, and every assumption that <em>did</em> fall becomes a documented trap carrying the wrong value next to the right one.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="col intro">
+    <div class="eyebrow">Triage</div>
+    <h2>Confidence is the wrong axis</h2>
+    <p>Every claim gets two labels. How well it is supported — and what happens when it is violated. Sorting work by the first is the intuitive move and the wrong one.</p>
+    <p>A rule that fails loudly is already half-safe: the system raises, someone investigates. The dangerous object is the claim you are <em>confident</em> about that returns a plausible number when it is wrong. Nobody investigates a plausible number.</p>
+  </div>
+
+  <div class="gridwrap">
+    <table class="triage">
+      <thead>
+        <tr>
+          <th scope="col"></th>
+          <th scope="col" class="sev1">Silent&nbsp;wrong</th>
+          <th scope="col">Loud&nbsp;fail</th>
+          <th scope="col">Cosmetic</th>
+        </tr>
+      </thead>
+      <tbody id="triage-body"></tbody>
+    </table>
+  </div>
+  <div class="readout" id="readout" aria-live="polite">
+    <span class="rlabel">Select a cell</span>
+    Twelve combinations, twelve different obligations. The column matters more than the row.
+  </div>
+
+  <div class="col">
+    <div class="pull">A claim marked silent-wrong with no enforcer is a defect. Write the validator, or downgrade the claim to unresolved.</div>
+    <p class="note">That rule is why the leftmost column carries the accent colour: it is the only column where documenting the finding is never a sufficient response.</p>
+  </div>
+</section>
+
+<section>
+  <div class="col intro">
+    <div class="eyebrow">Portability</div>
+    <h2>One pack, four kinds of system</h2>
+    <p>The phases never change. What changes is what their vocabulary is bound to — and binding it explicitly, before discovery starts, is what keeps a database run from inheriting an API run's assumptions.</p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Target type"></div>
+  <div class="vocabwrap">
+    <table class="vocab">
+      <thead><tr><th scope="col">Abstract term</th><th scope="col" id="bound-head">Bound to</th></tr></thead>
+      <tbody id="vocab-body"></tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:1.6rem">The Target Profiler writes this binding into the contract before any other phase runs. Later phases read the binding, not the generic table.</p>
+</section>
+
+<section>
+  <div class="col intro">
+    <div class="eyebrow">The gate</div>
+    <h2>Eight ways to be told no</h2>
+    <p>Each raises rather than warns, and each message carries three things: what was refused, why in one sentence, and the correct call ready to copy. An override is possible only through an explicit named argument, never a silent default.</p>
+  </div>
+
+  <ol class="refusals">
+    <li><span><span class="rname">UnresolvedContractRule</span><span class="rwhat">The request depends on a question only a human can answer. The refusal quotes that question and names its owner.</span></span></li>
+    <li><span><span class="rname">ForbiddenJoin</span><span class="rwhat">A join documented as invalid, refused with the fan-out factor that was measured when it was tested.</span></span></li>
+    <li><span><span class="rname">IncompatibleCombination</span><span class="rwhat">Sources, vintages, versions, units, or grains mixed without an explicit override.</span></span></li>
+    <li><span><span class="rname">AmbiguousTemporalSemantics</span><span class="rwhat">&ldquo;Latest&rdquo; with no time axis named. Published, observed, revised, and ingested routinely disagree.</span></span></li>
+    <li><span><span class="rname">InvalidAggregation</span><span class="rwhat">A measure summed along an axis it is not additive over.</span></span></li>
+    <li><span><span class="rname">KnownTrap</span><span class="rwhat">A shape already documented in the traps file, refused with the wrong value shown beside the right one.</span></span></li>
+    <li><span><span class="rname">LimitExceeded</span><span class="rwhat">Past a hard limit that was observed rather than assumed.</span></span></li>
+    <li><span><span class="rname">ForeignContractData</span><span class="rwhat">Data stamped with another contract's id. The cross-system guard: system A's values reaching system B's functions fail loudly instead of blending in.</span></span></li>
+  </ol>
+</section>
+
+<section>
+  <div class="col intro">
+    <div class="eyebrow">Where a rule should live</div>
+    <h2>Push everything downward</h2>
+    <p>Three layers hold the knowledge, and they are not equally reliable. The governing move is to migrate each rule as far down as it can go — because only the bottom layer holds when nobody is paying attention.</p>
+  </div>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 1020 300" role="img" aria-label="Three stacked layers. Agent reasoning at the top holds intent and ambiguity detection and is re-derived every run. The semantic contract in the middle holds meaning and authority and works only when read. Deterministic code at the bottom holds access, joins, and refusal and works whether or not it is read. An arrow points downward, labelled move every rule as far down as it can go.">
+        <defs>
+          <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/>
+          </marker>
+        </defs>
+
+        <rect x="120" y="16" width="740" height="72" rx="2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 4"/>
+        <text x="142" y="42" font-size="14" font-weight="600" fill="currentColor" style="font-family:var(--display)">Agent reasoning</text>
+        <text x="142" y="62" font-size="10.5" style="font-family:var(--mono);fill:var(--faint)">user intent · choosing among valid paths · spotting ambiguity · escalating</text>
+        <text x="142" y="78" font-size="10.5" style="font-family:var(--mono);fill:var(--faint)">re-derived on every single run, and never the same twice</text>
+
+        <rect x="120" y="106" width="740" height="72" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="142" y="132" font-size="14" font-weight="600" fill="currentColor" style="font-family:var(--display)">Semantic contract</text>
+        <text x="142" y="152" font-size="10.5" style="font-family:var(--mono);fill:var(--faint)">meaning · grain · authority · temporal semantics · what is forbidden</text>
+        <text x="142" y="168" font-size="10.5" style="font-family:var(--mono);fill:var(--faint)">works only when read at the moment of the decision</text>
+
+        <rect x="120" y="196" width="740" height="80" rx="2" stroke="currentColor" stroke-width="2.5" style="fill:var(--sunk)"/>
+        <text x="142" y="222" font-size="14" font-weight="600" fill="currentColor" style="font-family:var(--display)">Deterministic code</text>
+        <text x="142" y="242" font-size="10.5" style="font-family:var(--mono);fill:var(--faint)">access · pagination · joins · units · revisions · aggregation · refusal</text>
+        <text x="142" y="258" font-size="10.5" style="font-family:var(--mono);fill:var(--faint)">works whether or not anybody read anything</text>
+
+        <line x1="62" y1="30" x2="62" y2="258" stroke-width="2" marker-end="url(#ar3)" style="stroke:var(--accent)"/>
+        <text x="46" y="150" font-size="10.5" text-anchor="middle" transform="rotate(-90 46 150)" letter-spacing=".08em" style="font-family:var(--mono);fill:var(--accent)">move every rule as far down as it can go</text>
+
+        <text x="880" y="52" font-size="10" style="font-family:var(--mono);fill:var(--faint)">fragile</text>
+        <text x="880" y="146" font-size="10" style="font-family:var(--mono);fill:var(--faint)">conditional</text>
+        <text x="880" y="240" font-size="10" style="font-family:var(--mono);fill:var(--faint)">unconditional</text>
+      </svg>
+    </div>
+    <figcaption><b>Some things cannot move down, and should not.</b> Reading what a person actually meant, choosing between two defensible analytical paths, noticing that a question is underspecified — that is the top layer's real work, and it is done badly by code. The test is whether correct behaviour can be expressed and tested. If it can, it is not reasoning; it is a function that has not been written yet.</figcaption>
+  </figure>
+</section>
+
+<footer>
+  <div class="col">
+    <p style="margin:0">Semantic Reconnaissance Pack v2.1 — a portable skill for Claude Code, Codex CLI, and Copilot CLI.</p>
+    <span class="mono"><a href="https://github.com/FrancyJGLisboa/semantic-recon">github.com/FrancyJGLisboa/semantic-recon</a></span>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- triage grid ---------- */
+  var STATUS = [
+    {k:"DISCOVERED", cls:"s-dis", sub:"demonstrated"},
+    {k:"INFERRED",   cls:"s-inf", sub:"strongly supported"},
+    {k:"DECLARED",   cls:"s-dec", sub:"a human decided"},
+    {k:"UNRESOLVED", cls:"s-unr", sub:"not determinable"}
+  ];
+  var SEV = ["silent", "loud", "cosmetic"];
+  var CELLS = {
+    "DISCOVERED|silent":   ["Encode and test", "highest priority",
+      "It is demonstrated and it fails invisibly. Compile it into a function, write the test, and point the claim's enforced_by at that test. This is the work the whole run exists to produce."],
+    "DISCOVERED|loud":     ["Encode", "the system already raises",
+      "Worth encoding so agents stop rediscovering it, but the target already protects itself here. Do it after the silent column is clear."],
+    "DISCOVERED|cosmetic": ["Document", "reference only",
+      "A label, a display convention, a formatting quirk. It belongs in the reference files, not in the instruction file and not in code."],
+    "INFERRED|silent":     ["Falsify first", "before anything else",
+      "Plausible, invisible when wrong, and not yet attacked. Hand it to the red team before it is encoded — encoding an unfalsified inference just makes a guess harder to question later."],
+    "INFERRED|loud":       ["Falsify, then encode", "attack is cheap here",
+      "Attack it, then encode what survives. The failure is visible, so a mistake here costs an error message rather than a bad decision."],
+    "INFERRED|cosmetic":   ["Document with confidence", "state the match rate",
+      "Record it with its observed consistency rate rather than a binary verdict. Ninety-four percent across eight thousand records is information; 'verified' is not."],
+    "DECLARED|silent":     ["Name the owner, then enforce", "policy, not inference",
+      "Somebody decided this, and getting it wrong is invisible. Record who decided, then enforce it in code. Never let an agent re-derive a policy from data — the data cannot tell it what the organisation chose."],
+    "DECLARED|loud":       ["Record the owner", "traceable",
+      "Write down who owns the decision so the next person can reopen it with the right person rather than guessing at intent."],
+    "DECLARED|cosmetic":   ["Record", "low stakes",
+      "Note it and move on. A naming or presentation convention somebody chose."],
+    "UNRESOLVED|silent":   ["Refuse", "the gate must raise",
+      "The most valuable entry in the contract. Give it a triggers_on shape so validate_query refuses any request that touches it, with the precise question and its owner in the message. Silence here is how a contract lies."],
+    "UNRESOLVED|loud":     ["Ask precisely", "one answerable question",
+      "Write one question a domain owner can answer in a sentence, with the cost of getting it wrong attached. 'How does the data work' is not that question."],
+    "UNRESOLVED|cosmetic": ["Note it", "do not spend the budget",
+      "Log it in the uncertainties file and move on. Not everything unknown is worth resolving."]
+  };
+
+  var tbody = document.getElementById("triage-body");
+  var readout = document.getElementById("readout");
+  var current = null;
+
+  STATUS.forEach(function(st){
+    var tr = document.createElement("tr");
+    var th = document.createElement("th");
+    th.setAttribute("scope","row");
+    th.innerHTML = '<span class="stat ' + st.cls + '">' + st.k + '</span><span>' + st.sub + '</span>';
+    tr.appendChild(th);
+    SEV.forEach(function(sev){
+      var td = document.createElement("td");
+      td.className = "cell";
+      var data = CELLS[st.k + "|" + sev];
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "cellbtn";
+      btn.setAttribute("aria-pressed","false");
+      btn.innerHTML = data[0] + '<span class="tick">' + data[1] + '</span>';
+      btn.addEventListener("click", function(){
+        if (current) current.setAttribute("aria-pressed","false");
+        btn.setAttribute("aria-pressed","true");
+        current = btn;
+        readout.innerHTML = '<span class="rlabel">' + st.k + ' &middot; ' +
+          (sev === "silent" ? "silently wrong" : sev === "loud" ? "fails loudly" : "cosmetic") +
+          '</span>' + data[2];
+      });
+      td.appendChild(btn);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  /* ---------- vocabulary switcher ---------- */
+  var TYPES = [
+    {id:"DATA_API",    label:"Data API"},
+    {id:"DATABASE",    label:"Database"},
+    {id:"MCP_SERVER",  label:"MCP server"},
+    {id:"CODEBASE",    label:"Codebase"}
+  ];
+  var VOCAB = [
+    ["Access",     "auth scheme, base URL, endpoints", "DSN, driver, roles, grants, schemas", "transport, handshake, capability negotiation", "build, install, entrypoints, run modes"],
+    ["Entity",     "resource or dataset", "table, view, materialised view", "tool, resource, prompt", "module, service, domain object"],
+    ["Field",      "response field or parameter", "column", "input and output schema property", "struct field, function parameter"],
+    ["Measure",    "metric", "aggregate over a column", "what the tool returns, and what it means", "computed or emitted value"],
+    ["Grain",      "one record means what?", "primary key grain", "one call is what unit of work?", "one invocation has what effect?"],
+    ["Relationship","join key and its expansion", "foreign key, junction table", "tool chaining and composition", "call graph, import graph"],
+    ["Cardinality","one-to-one, one-to-many, many-to-many", "foreign key cardinality, fan-out", "calls needed per outcome", "fan-out of a call"],
+    ["Temporal",   "observation vs publication vs revision", "valid time vs transaction time, as-of", "session scope, cache TTL, idempotency window", "migrations, API versioning, eventual consistency"],
+    ["Authority",  "source precedence", "source of truth vs replica vs materialised view", "which server owns which fact", "which module owns which write path"],
+    ["Business rule","source selection, suppression, vintages", "constraints, triggers, soft delete, tenancy", "idempotency, side effects, confirmation requirements", "invariants, feature flags, permissions"],
+    ["Forbidden op","a join that fans out, mixed vintages", "cross-database join, unbounded scan", "destructive tool without confirmation", "writing to the database past the service layer"],
+    ["Revision",   "vintages and restatements", "updated_at, history tables", "protocol and tool version drift", "migrations, deprecated APIs"],
+    ["Discovery",  "metadata endpoints, OpenAPI", "information_schema, catalog, EXPLAIN", "tools/list, resources/list, server info", "README, ADRs, tests, types, CI config"]
+  ];
+
+  var tabs = document.querySelector(".tabs");
+  var vbody = document.getElementById("vocab-body");
+  var vhead = document.getElementById("bound-head");
+
+  function render(i){
+    vbody.innerHTML = "";
+    vhead.textContent = TYPES[i].label;
+    VOCAB.forEach(function(row){
+      var tr = document.createElement("tr");
+      var a = document.createElement("td");
+      a.className = "concept";
+      a.textContent = row[0].toUpperCase();
+      var b = document.createElement("td");
+      b.className = "bound";
+      b.textContent = row[i + 1];
+      tr.appendChild(a); tr.appendChild(b);
+      vbody.appendChild(tr);
+    });
+    Array.prototype.forEach.call(tabs.children, function(t, j){
+      t.setAttribute("aria-selected", j === i ? "true" : "false");
+    });
+  }
+
+  TYPES.forEach(function(t, i){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "tab";
+    b.setAttribute("role","tab");
+    b.setAttribute("aria-selected","false");
+    b.textContent = t.label;
+    b.addEventListener("click", function(){ render(i); });
+    tabs.appendChild(b);
+  });
+  render(0);
+})();
+</script>
+
+</body>
+</html>
