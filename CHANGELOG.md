@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3
+- Section 8.3 gains class (f), human-facing output. A gate can force a caller to
+  pass a model and still not force it to say which one answered; every rule
+  enforced in the data structure evaporates when a number is rendered into prose
+  without its origin. The contract must own that rendering and ship no formatter
+  that can omit provenance.
+- `ENFORCEMENT-G1` now requires a test enumerating the public formatters.
+- Found the same way as 2.2: a skill built on a finished contract inherited
+  every refusal correctly, then printed `22.2 °C` with no source attached.
+
 ## 2.2
 - Section 8.3: the enforcement compliance pass runs twice — against the target
   system, and against the contract's own code. Names five recurring bypass

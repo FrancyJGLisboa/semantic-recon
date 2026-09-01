@@ -1,6 +1,6 @@
 # Reference Implementation Engineer
 
-<!-- Generated from references/full-pack.txt (pack v2.2) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.3) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 8. REFERENCE IMPLEMENTATION ENGINEER PROMPT
@@ -149,6 +149,22 @@ on faith. Attack each one. The recurring classes:
      tolerance - is a guess wearing a number. Widen it for margin, trace it to
      the observation in a comment, and file it as UNRESOLVED.
 
+  f) HUMAN-FACING OUTPUT
+     The last place identity is lost is the sentence. A gate can force a caller
+     to pass a model and still not force it to say which model answered. Every
+     rule enforced in the data structure evaporates the moment a number is
+     rendered into prose without its origin, and prose is what reaches the
+     person who acts on it. This is (c) one level up, and it is the one most
+     often missed because the values were correct right until they were printed.
+     Fix: the contract owns the rendering of anything a person will read, and
+     ships no formatter that can omit provenance. Computed figures - a total, a
+     mean, a delta - need this most, because a derived number no longer looks
+     like it came from anywhere. Unidentified sources and used overrides must
+     appear in that output, not only in a field.
+     Test for it: enumerate every public function whose return value could be
+     shown to a person as-is. If any of them can produce a clean-looking string
+     with no source attached, the bypass is open.
+
 Write pass 2's enumeration into the contract even where an item turned out to
 be safe. The list is the evidence that the pass happened; the absence of an
 item is indistinguishable from not having looked.
@@ -198,10 +214,12 @@ ENFORCEMENT-G1 passes only if:
 - Every override path requires an explicit named argument and logs its use.
 - PASS 1 ran: at least three attempts to reach a silently-wrong result through
   the target's surface, all refused, all in tests/test_validators.py.
-- PASS 2 ran: the five classes in section 8.3 enumerated in writing, each
+- PASS 2 ran: the six classes in section 8.3 enumerated in writing, each
   attacked, every bypass either closed or DECLARED with its scope. An empty
   enumeration fails this gate - it means the pass was skipped, not that the
   code was clean.
+- No public function can render a value for a person without its provenance
+  attached, proven by a test that enumerates the formatters.
 - No claim that "no further bypass exists" appears anywhere in the contract
   unless both passes are documented.
 ```

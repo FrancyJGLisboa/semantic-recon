@@ -1,6 +1,6 @@
 # Semantic and Ontology Analyst
 
-<!-- Generated from references/full-pack.txt (pack v2.2) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.3) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 5. SEMANTIC AND ONTOLOGY ANALYST PROMPT

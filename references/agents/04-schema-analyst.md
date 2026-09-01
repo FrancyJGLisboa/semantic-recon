@@ -1,6 +1,6 @@
 # Schema and Metadata Analyst
 
-<!-- Generated from references/full-pack.txt (pack v2.2) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.3) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 4. SCHEMA AND METADATA ANALYST PROMPT
