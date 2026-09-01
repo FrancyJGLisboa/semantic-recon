@@ -1,6 +1,6 @@
 # Type-Specific Probes + Output Structure
 
-<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.5) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.2 TYPE-SPECIFIC MANDATORY PROBES

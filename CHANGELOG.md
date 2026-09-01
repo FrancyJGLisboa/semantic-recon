@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.5
+- Section 12b.2: the registry's other job is proving that NO contract can answer
+  a question, with reasons — something no single contract can do, because a
+  contract only knows itself.
+- `subject` is required on every contract row and every question, and gates
+  candidacy before capability. Inferring it is the same mistake as inferring a
+  preference.
+- The capability table's first column is `subject`, and inapplicable cells are
+  written "n/a" with a reason rather than left blank, because a blank reads as
+  "no".
+- `REGISTRY-G1` now requires tests for a subject-less question and for a
+  question nothing can answer.
+- Found by registering a third contract on a different domain. While every
+  contract shared a subject the arbiter only appeared to work; the gap surfaced
+  as failing tests, which is the good case only because the tests existed.
+  **Two contracts in one domain do not test a registry.**
+
 ## 2.4
 - Section 12b, the registry layer: what appears once two contracts describe
   overlapping facts, and why neither of them can produce it. Capability decides

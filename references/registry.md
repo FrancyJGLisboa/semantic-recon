@@ -1,6 +1,6 @@
 # The Registry Layer (multiple contracts)
 
-<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.5) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 12b. THE REGISTRY LAYER  (only once you hold more than one contract)
@@ -10,8 +10,9 @@ Everything before this section produces ONE contract. This section is about
 what appears the moment two of them describe overlapping facts, and it is not
 producible by either contract, because the question it answers is above both.
 
-Do not build this speculatively. It is worth writing when, and only when, two
-registered contracts can answer the same question.
+Do not build this speculatively. It is worth writing once the registry holds a
+second contract — whether or not it overlaps the first. Overlap is the obvious
+reason; 12b.2 is the one that is easy to miss.
 
 ----------------------------------------------------------------------
 12b.1 WHY NEITHER CONTRACT CAN DECIDE
@@ -32,7 +33,52 @@ because they share an upstream model, at one location, on one day, and diverge
 elsewhere by an order of magnitude more than the agreement suggested.
 
 ----------------------------------------------------------------------
-12b.2 THE RULE
+12b.2 THE OTHER REASON: PROVING THAT NOTHING CAN ANSWER
+----------------------------------------------------------------------
+
+Overlap is the obvious reason for this layer. The opposite case is the one that
+gets missed, and it only appears once a contract joins on a different subject.
+
+When registered contracts cover different domains, the arbiter's job is not to
+choose between them. It is to state, WITH REASONS, that none of them can answer
+the question:
+
+  "when was the March 2019 forecast run?"
+    -> REFUSED. Contract A exposes no run time; contract B has no history.
+
+That is more useful than the closest available answer, and no single contract
+can say it, because a contract only knows itself. Proving a question is
+unanswerable is a service the registry provides and the contracts cannot.
+
+SUBJECT IS REQUIRED, NOT OPTIONAL
+
+This needs a `subject` on every contract row, not only on colliding ones, and
+it needs every question to name one. A date alone does not say what is being
+asked about: "1 March 2019" is a weather question or an agricultural question
+depending on something the arbiter cannot see.
+
+Gate on subject BEFORE capability. A contract excluded for covering the wrong
+domain produces a clearer refusal than one excluded for lacking a field, and
+the exclusion is certain rather than a judgement.
+
+Refuse a question that names no subject. Inferring it from the wording is the
+same mistake as inferring a preference (12b.3): the inference will be inherited,
+cited, and defended by agents with no idea nobody made it.
+
+TWO CONTRACTS IN ONE DOMAIN DO NOT TEST A REGISTRY
+
+While every registered contract shares a subject, every question is implicitly
+about that subject. `subject` looks optional. The arbiter appears to work. It is
+not until a contract arrives from another domain that the gap shows — and it
+shows up as failing tests rather than as a wrong answer, which is the good case
+only because somebody wrote the tests first.
+
+So add the subject field while you still have two contracts, before you can
+demonstrate you need it. By the time you can demonstrate it, agents are already
+relying on the arbiter.
+
+----------------------------------------------------------------------
+12b.3 THE RULE
 ----------------------------------------------------------------------
 
 CAPABILITY DECIDES WHERE CAPABILITY CAN DECIDE. EVERYTHING ELSE ESCALATES.
@@ -52,12 +98,17 @@ it must be a decision somebody made. Capability rows are derived from evidence;
 preference rows are not derivable at all.
 
 ----------------------------------------------------------------------
-12b.3 THE CAPABILITY TABLE
+12b.4 THE CAPABILITY TABLE
 ----------------------------------------------------------------------
 
-One row per contract, one column per thing that decides who can answer:
-coverage in time, horizon, which provenance fields exist, which dimensions can
-be pinned, unit vocabulary.
+One row per contract. The FIRST column is `subject`, because it decides
+candidacy before any capability does. Then one column per thing that decides
+who can answer: coverage in time, horizon, which provenance fields exist, which
+dimensions can be pinned, unit vocabulary.
+
+Where a column does not apply to a contract, write "n/a" and why, not a blank.
+A blank reads as "no" and will exclude that contract from questions it could
+have answered.
 
 Every cell MUST cite the claim id in that contract which established it. A
 capability table assembled from impressions is a preference table in disguise.
@@ -67,7 +118,7 @@ produces a CAPABILITY ruling, and a ruling that names why the other contracts
 cannot answer is auditable in a way that "we chose X" never is.
 
 ----------------------------------------------------------------------
-12b.4 COMPARE IS ALLOWED. MERGE IS NOT.
+12b.5 COMPARE IS ALLOWED. MERGE IS NOT.
 ----------------------------------------------------------------------
 
 Provide a comparison that returns every candidate side by side, each with its
@@ -85,7 +136,7 @@ nothing for an override to unlock. An override here would be a contract
 granting itself authority it does not have.
 
 ----------------------------------------------------------------------
-12b.5 HOOKS INTO THE REST OF THE PACK
+12b.6 HOOKS INTO THE REST OF THE PACK
 ----------------------------------------------------------------------
 
 TARGET PROFILER (section 1b)
@@ -106,6 +157,11 @@ THE CONTRACTS THEMSELVES
   call it and the guards are not.
 
 REGISTRY-G1 passes only if:
+- Every contract row carries a `subject`, and routing gates on it before
+  capability.
+- A question naming no subject is refused, proven by a test.
+- A question no registered contract can answer produces a refusal that names
+  why each one was excluded, proven by a test.
 - Every capability cell cites the claim that established it.
 - The preference table is empty, or every row in it names who decided and when.
 - A test asserts the preference table cannot be populated by inference.

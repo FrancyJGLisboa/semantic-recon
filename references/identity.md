@@ -1,6 +1,6 @@
 # CONTRACT_ID Derivation + Identity Discipline
 
-<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.5) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.1a CONTRACT_ID DERIVATION  (owned by the Target Profiler, not the operator)
@@ -52,7 +52,11 @@ STEP 2 - NORMALIZE (deterministic; same input must always give same output)
       <vendor>_<host-first-label> from TARGET_LOCATION
 
 Examples:
-  "USDA NASS QuickStats API v1"        -> usda_quickstats
+  "USDA/NASS QuickStats API"           -> usda_nass_quickstats
+     (three tokens, not two: "nass" is not a noise token, so it survives.
+      This example was hand-written as usda_quickstats until the pack was
+      actually run against the system, which produced the longer form. Worked
+      examples in a spec drift from the spec unless somebody executes them.)
   serverInfo.name "github-mcp-server"  -> github
   postgres db "orders_prod" on rds     -> orders
   repo "acme/billing-service"          -> acme_billing

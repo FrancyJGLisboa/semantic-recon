@@ -1,6 +1,6 @@
 # Adversarial Validator / Semantic Red Team
 
-<!-- Generated from references/full-pack.txt (pack v2.4) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.5) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 7. ADVERSARIAL VALIDATOR / SEMANTIC RED TEAM PROMPT
