@@ -32,7 +32,28 @@ def normalise(t):
     return re.sub(r"\s+", " ", t).lower()
 
 
+def hardcoded_versions():
+    """A version number typed into a fragment is a claim that goes stale
+    silently. Use {{PACK_VERSION}}; build-docs.py fills it from the pack."""
+    bad = []
+    for name in ("index.html", "concepts.html"):
+        path = os.path.join(ROOT, "docs", "src", name)
+        for i, line in enumerate(open(path, encoding="utf-8"), 1):
+            if re.search(r"\bv\d+\.\d+\b", line):
+                bad.append("%s:%d  %s" % (name, i, line.strip()[:70]))
+    return bad
+
+
 def main():
+    stale = hardcoded_versions()
+    if stale:
+        print("HARDCODED VERSION in a page fragment\n")
+        for b in stale:
+            print("  %s" % b)
+        print("\nUse {{PACK_VERSION}}; build-docs.py fills it from "
+              "references/full-pack.txt.")
+        return 1
+
     md = open(os.path.join(ROOT, "GETTING-STARTED.md"), encoding="utf-8").read()
     html = open(os.path.join(ROOT, "docs", "src", "index.html"),
                 encoding="utf-8").read()

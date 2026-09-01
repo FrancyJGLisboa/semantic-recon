@@ -45,8 +45,20 @@ FAVICON = ('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 '
            '\U0001F9ED</text></svg>')
 
 
+def pack_version():
+    """Read it from the pack itself. A version typed into a page is a claim
+    that stops being true the moment the pack moves, and nothing would say so."""
+    pack = os.path.join(ROOT, 'references', 'full-pack.txt')
+    with open(pack, encoding='utf-8') as fh:
+        for line in fh:
+            if line.startswith('Version:'):
+                return line.split(':', 1)[1].strip()
+    sys.exit('no Version: line in references/full-pack.txt')
+
+
 def build(name, is_index, desc):
     frag = open(os.path.join(SRC, name), encoding='utf-8').read()
+    frag = frag.replace('{{PACK_VERSION}}', pack_version())
     m = re.search(r'<title>(.*?)</title>', frag)
     if not m:
         sys.exit('%s has no <title>' % name)
@@ -74,4 +86,5 @@ def build(name, is_index, desc):
 if __name__ == '__main__':
     for n, i, d in PAGES:
         build(n, i, d)
-    print('\nbuilt %d pages from docs/src/' % len(PAGES))
+    print('\nbuilt %d pages from docs/src/ (pack v%s)'
+          % (len(PAGES), pack_version()))
