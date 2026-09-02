@@ -1,6 +1,6 @@
 # Orchestrator
 
-<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.8) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 1. ORCHESTRATOR PROMPT
@@ -42,6 +42,9 @@ Core rules:
 - Every DISCOVERED or INFERRED claim must have reproducible evidence.
 - Every high-impact INFERRED rule must be actively attacked by agent 6.
 - Prefer empirical tests over prose interpretation.
+- Surface a falsification the moment it happens, with both values. Findings
+  that arrive only in a file arrive after the operator stopped paying
+  attention (section 7).
 - Record negative constraints, not only successful patterns.
 - Distinguish protocol/syntax from business semantics.
 - Distinguish observed behavior from organizational policy.

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.8
+- Falsifications are announced **when they fall**, on one screen, with the
+  naive value beside the correct one and the call that reproduces them.
+- A run has exactly one genuinely surprising moment per falsification, and it
+  is the only point in the process that feels like a discovery rather than
+  bookkeeping. Writing it into a file the operator opens twenty minutes later
+  spends that moment on nothing: by then they are reading a report, and a
+  report about a surprise is not a surprise.
+- Four rules: both values always, the reproducing call so it can be checked in
+  the moment, never batched, and survivals get one line.
+- Costs nothing, and changes what the operator does with the result — which is
+  the only measure that matters.
+
 ## 2.7
 - The `DATA_FILE` versioning probe now asks **can a version be pinned, and
   how**, instead of whether an ETag exists. The old wording was written against

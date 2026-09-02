@@ -3,7 +3,7 @@ name: semantic-recon
 description: Give AI agents better conditions to be built with expertise on a system: probe an API, MCP server, database, or codebase by running it, and compile what it actually does into a data_contract_<id>/ folder whose code refuses the operations that are silently wrong. Use when asked to map, learn, document, or build a contract for a system so other agents can use it correctly; when credentials for a system exist and its semantics must be discovered and verified; or on any invocation like /semantic-recon, "semantic orchestrator", "build a data contract", "make agents expert on this system", "refresh the contract". Eleven gated phases: holdout questions frozen before discovery, blast-radius triage, adversarial falsification, and a validate_query gate that refuses rather than describes.
 license: MIT
 metadata:
-  version: "2.7"
+  version: "2.8"
   pack: Semantic Reconnaissance Prompt Pack
 ---
 
@@ -39,7 +39,11 @@ system will be used repeatedly, by agents, and being silently wrong is expensive
 3. **Triage by blast radius, not by confidence.** A high-confidence
    `SILENT_WRONG` claim is the most dangerous object in the contract; a
    `LOUD_FAIL` claim already protects itself.
-4. **Code that refuses beats prose that explains.** If a downstream agent can
+4. **Say it when it falls.** Announce every falsification the moment it
+   happens, with the wrong value beside the right one and the call that
+   reproduces it. A finding that arrives only in a file arrives after the
+   operator stopped watching.
+5. **Code that refuses beats prose that explains.** If a downstream agent can
    produce a silently wrong result without any exception firing, that is a
    defect in the code layer, not a documentation gap. Attack the target AND
    your own code — a caller-asserted label, an opt-in validator, or a bare
@@ -47,9 +51,9 @@ system will be used repeatedly, by agents, and being silently wrong is expensive
    (section 8.3). Provenance must survive formatting: a contract that hands a
    person a clean number with no source has lost the identity it spent the
    whole run establishing.
-5. **Never persist, print, or document a credential.** Env injection only.
+6. **Never persist, print, or document a credential.** Env injection only.
    Record the variable name in TARGET.md, never the value.
-6. **Every artifact is stamped with CONTRACT_ID.** Agents quote content, not
+7. **Every artifact is stamped with CONTRACT_ID.** Agents quote content, not
    paths. An unattributed fragment is unusable, not probably-ours.
 
 ## Phases

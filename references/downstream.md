@@ -1,6 +1,6 @@
 # Downstream Bootstrap + Contract Refresh
 
-<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.8) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 11. DOWNSTREAM PRODUCTION AGENT BOOTSTRAP PROMPT

@@ -1,6 +1,6 @@
 # CONTRACT_ID Derivation + Identity Discipline
 
-<!-- Generated from references/full-pack.txt (pack v2.7) by scripts/split.py. Do not edit; edit the pack and re-split. -->
+<!-- Generated from references/full-pack.txt (pack v2.8) by scripts/split.py. Do not edit; edit the pack and re-split. -->
 
 ```
 0.1a CONTRACT_ID DERIVATION  (owned by the Target Profiler, not the operator)
