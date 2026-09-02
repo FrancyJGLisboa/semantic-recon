@@ -72,6 +72,21 @@ That is the whole trade. You spend an hour once. After that, correctness on this
 system stops depending on whether the next person happens to know the five
 things that matter.
 
+## Scope, in one line
+
+**It maps how one external system actually behaves, and compiles what it found
+into refusals that fire in code.**
+
+Note the term is already taken: in most of the industry a *data contract* is a
+**producer-side agreement**, enforced when the publisher writes. This is the
+**consumer-side inverse** — nobody agreed to anything, and what you get is a
+reconstruction built by probing. If you have a real producer-side contract, use
+it; this is for everything else.
+
+It is **not** data quality, not a catalog, not ETL, not monitoring, not a schema
+registry, and not a substitute for reading the docs. [SCOPE.md](SCOPE.md) says
+where each boundary is and why.
+
 ## What this rests on
 
 The pack has been run end to end twice, against two public weather APIs.
